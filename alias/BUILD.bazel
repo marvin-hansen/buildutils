@@ -1,0 +1,11 @@
+# Make all aliases public by default
+package(default_visibility = ["//visibility:public"])
+
+###############################################################################
+# Utils
+###############################################################################
+
+alias(
+    name = "wait_utils",
+    actual = "//crates/wait_utils",
+)

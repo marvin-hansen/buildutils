@@ -1,7 +1,8 @@
 [workspace]
 resolver = "2"
+
 members = [
-    "wait_utils"
+    "crates/*"
 ]
 
 
@@ -42,6 +43,7 @@ codegen-units = 1 # Reduce Parallel Code Generation Units to Increase Optimizati
 # ==============
 # Internal Aliases
 # ==============
+wait_utils = { path = "crates/wait_utils" }
 
 
 # ==============
@@ -49,5 +51,4 @@ codegen-units = 1 # Reduce Parallel Code Generation Units to Increase Optimizati
 # ==============
 tokio = { version = "1.42", default-features = false, features = ["macros", "net", "rt-multi-thread", "signal", "time"] }
 tonic = { version = "0.12.1", features = ["transport"] }
-tonic-build = { version = "0.12.1" }
 tonic-health = { version = "0.12.3", default-features = false, features = ["transport"] }
