@@ -1,4 +1,4 @@
-use crate::{DockerError, DockerUtil, ContainerConfig};
+use crate::{ContainerConfig, DockerError, DockerUtil};
 use std::process::Command;
 use wait_utils::WaitStrategy;
 
