@@ -1,6 +1,8 @@
 mod error;
 mod types;
 mod verify;
+mod service;
+mod api;
 
 // Re-exports
 pub use error::*;
@@ -41,7 +43,7 @@ impl ServiceUtil {
         if dbg {
             println!("[ServiceUtil]: Verify all binaries in path: {root_path}");
         }
-        verify::check_if_binary_exists(dbg, root_path, &binaries)?;
+        verify::verify_binary_exists(dbg, root_path, &binaries)?;
 
         Ok(ServiceUtil {
             dbg,

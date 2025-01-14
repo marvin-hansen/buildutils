@@ -1,6 +1,6 @@
-use crate::{ServiceUtilError};
+use crate::ServiceUtilError;
 
-pub(crate) fn check_if_binary_exists(
+pub(crate) fn verify_binary_exists(
     dbg: bool,
     root_path: &'static str,
     binaries: &Vec<&'static str>,
