@@ -1,0 +1,36 @@
+load("@rules_rust//rust:defs.bzl", "rust_doc", "rust_doc_test", "rust_library")
+
+rust_library(
+    name = "docker_utils",
+    srcs = glob([
+        "src/*.rs",
+        "src/*/*.rs",
+    ]),
+    crate_root = "src/lib.rs",
+    tags = [
+        "docker_utils",
+        "utils-test",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        # Internal crates
+        "//alias:common_container",
+        "//alias:wait_utils",
+        # External crates
+        "//thirdparty/crates:tokio",
+    ],
+)
+
+rust_doc(
+    name = "doc",
+    crate = ":docker_utils",
+    tags = ["doc"],
+    visibility = ["//visibility:public"],
+)
+
+rust_doc_test(
+    name = "doc_test",
+    crate = ":docker_utils",
+    tags = ["doc-test"],
+    visibility = ["//visibility:public"],
+)
