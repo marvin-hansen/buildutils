@@ -41,7 +41,6 @@ impl DockerUtil {
             // https://stackoverflow.com/questions/35122773/single-command-to-stop-and-remove-docker-container
             return match Command::new("docker")
                 .arg("rm")
-                .arg("rf")
                 .arg("-f")
                 .arg(container_id)
                 .status()
