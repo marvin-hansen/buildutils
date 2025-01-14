@@ -1,0 +1,20 @@
+[package]
+name = "service_utils"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+readme.workspace = true
+repository.workspace = true
+authors.workspace = true
+license.workspace = true
+
+
+[lints]
+workspace = true
+
+
+[dependencies]
+# Internal crates
+wait_utils = {workspace = true}
+# External crates
+tokio = { workspace = true }
