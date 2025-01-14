@@ -1,8 +1,8 @@
+mod api;
 mod error;
+mod service;
 mod types;
 mod verify;
-mod service;
-mod api;
 
 // Re-exports
 pub use error::*;

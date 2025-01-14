@@ -8,7 +8,7 @@ echo "Lint targets "
 echo "=============="
 # https://users.rust-lang.org/t/ive-ran-clippy-on-100k-crates/117127
 # https://www.reddit.com/r/rust/comments/a4wblu/how_to_configure_clippy_to_be_as_annoying_as/
-cargo clippy --workspace --all-targets --exclude proto_cmdb --exclude proto_imdb --exclude proto_mddb --exclude  proto_smdb -- -Wclippy::all
+cargo clippy --workspace --all-targets -- -Wclippy::all
 
 echo "=============="
 echo "Format targets "
@@ -16,7 +16,7 @@ echo "=============="
 # Bazel file formatting (Installed via homebrew)
 # https://github.com/bazelbuild/buildtools
 command buildifier -r MODULE.bazel BUILD.bazel thirdparty/BUILD.bazel
-command buildifier -r build images queng_*
+command buildifier -r build crates/*
 
 # Rust code formatting
 # https://github.com/rust-lang/rustfmt

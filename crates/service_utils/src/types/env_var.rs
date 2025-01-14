@@ -13,7 +13,7 @@ impl EnvVar {
 }
 
 impl EnvVar {
-    pub fn values(&self) -> (String, String){
+    pub fn values(&self) -> (String, String) {
         (self.env.to_string(), self.value.to_string())
     }
 }

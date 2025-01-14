@@ -1,8 +1,7 @@
-use wait_utils::WaitStrategy;
 use crate::{ServiceUtil, ServiceUtilError};
+use wait_utils::WaitStrategy;
 
 impl ServiceUtil {
-
     /// Waits for the program to become ready based on the given wait strategy.
     ///
     /// # Arguments
