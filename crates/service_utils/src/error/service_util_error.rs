@@ -4,6 +4,7 @@ use std::fmt::Formatter;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum ServiceUtilError {
+    BinaryNotFound(String),
     ServiceStartFailed(String),
     ServiceHealthcheckFailed(String),
     ServiceStopFailed(String),
@@ -17,6 +18,9 @@ impl Error for ServiceUtilError {}
 impl fmt::Display for ServiceUtilError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
+            Self::BinaryNotFound(e) => {
+                write!(f, "[ServiceUtilError]: Binary not found: {e}")
+            }
             Self::ServiceStartFailed(e) => {
                 write!(f, "[ServiceUtilError]: Service start failed: {e}")
             }
