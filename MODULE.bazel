@@ -1,0 +1,32 @@
+module(name = "cgp-exploration")
+
+###############################################################################
+# Bazel Dependencies https://registry.bazel.build/
+###############################################################################
+bazel_dep(name = "platforms", version = "0.0.10")
+bazel_dep(name = "rules_rust", version = "0.56.0")
+
+# Toolchains
+bazel_dep(name = "toolchains_musl", version = "0.1.20", dev_dependency = True)
+
+###############################################################################
+# Rust toolchain https://github.com/bazelbuild/rules_rust/releases
+###############################################################################
+RUST_EDITION = "2021"  # NOTE: 2024 will be released with Rust 1.85.0
+
+RUST_VERSION = "1.83.0"
+
+rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
+rust.toolchain(
+    edition = RUST_EDITION,
+    extra_target_triples = [
+        "x86_64-unknown-linux-musl",
+        "aarch64-unknown-linux-musl",
+    ],
+    versions = [RUST_VERSION],
+)
+use_repo(rust, "rust_toolchains")
+
+register_toolchains("@rust_toolchains//:all")
+
+# Rust dependencies; see thirdparty/BUILD.bazel

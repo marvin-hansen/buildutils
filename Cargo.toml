@@ -1,0 +1,53 @@
+[workspace]
+resolver = "2"
+members = [
+    "wait_utils"
+]
+
+
+[workspace.package]
+edition = "2021"
+rust-version = "1.82.0"
+readme = "README.md"
+repository = "https://github.com/marvin-hansen/cgp-exploration"
+authors = ["Marvin Hansen <marvin.hansen@gmail.com>"]
+license = "MIT"
+
+# Linting with clippy
+[workspace.lints.clippy]
+all = "warn"
+
+# Linting strict mode
+[workspace.lints.rust]
+# Warnings
+deprecated-safe = "warn"
+deprecated_safe_2024 = "warn"
+
+# Optimize all crates
+[profile.release]
+opt-level = 3
+strip = true  # Automatically strip debug symbols from the binary
+lto = true    # Enable Link Time Optimization (LTO)
+codegen-units = 1 # Reduce Parallel Code Generation Units to Increase Optimization
+
+# There's a Cargo feature named profile-overrides
+# that lets you override the optimization level of dependencies.
+# https://docs.rust-embedded.org/book/unsorted/speed-vs-size.html
+[profile.release.package."*"]
+opt-level = 3
+strip = 'debuginfo'  # Automatically strip debug infos from the binary to reduce size
+codegen-units = 1 # Reduce Parallel Code Generation Units to Increase Optimization
+
+[workspace.dependencies]
+# ==============
+# Internal Aliases
+# ==============
+
+
+# ==============
+# External crates
+# ==============
+tokio = { version = "1.42", default-features = false, features = ["macros", "net", "rt-multi-thread", "signal", "time"] }
+tonic = { version = "0.12.1", features = ["transport"] }
+tonic-build = { version = "0.12.1" }
+tonic-health = { version = "0.12.3", default-features = false, features = ["transport"] }

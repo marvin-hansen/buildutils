@@ -1,0 +1,37 @@
+load("@rules_rust//rust:defs.bzl", "rust_doc", "rust_doc_test", "rust_library")
+
+rust_library(
+    name = "wait_utils",
+    srcs = glob([
+        "src/*.rs",
+        "src/*/*.rs",
+    ]),
+    crate_root = "src/lib.rs",
+    tags = [
+        "utils-test",
+        "wait_utils",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        # Internal crates
+
+        # External crates
+        "//thirdparty/crates:tokio",
+        "//thirdparty/crates:tonic",
+        "//thirdparty/crates:tonic-health",
+    ],
+)
+
+rust_doc(
+    name = "doc",
+    crate = ":wait_utils",
+    tags = ["doc"],
+    visibility = ["//visibility:public"],
+)
+
+rust_doc_test(
+    name = "doc_test",
+    crate = ":wait_utils",
+    tags = ["doc-test"],
+    visibility = ["//visibility:public"],
+)

@@ -1,0 +1,38 @@
+load("@rules_rust//crate_universe:defs.bzl", "crate", "crates_vendor")
+
+crates_vendor(
+    name = "crates_vendor",
+    annotations = {},
+    mode = "local",
+    packages = {
+        "tokio": crate.spec(
+            default_features = False,
+            features = [
+                "macros",
+                "net",
+                "rt-multi-thread",
+                "signal",
+                "time",
+            ],
+            package = "tokio",
+            version = "1.42",
+        ),
+        "tonic": crate.spec(
+            features = ["transport"],
+            package = "tonic",
+            version = "0.12",
+        ),
+        "tonic-build": crate.spec(
+            package = "tonic-build",
+            version = "0.12",
+        ),
+        "tonic-health": crate.spec(
+            default_features = False,
+            features = ["transport"],
+            package = "tonic-health",
+            version = "0.12",
+        ),
+    },
+    repository_name = "queng_vendored",
+    tags = ["manual"],
+)

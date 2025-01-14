@@ -1,0 +1,67 @@
+###############################################################################
+# Imports
+###############################################################################
+
+###############################################################################
+# Platform
+###############################################################################
+package(default_visibility = ["//visibility:public"])
+
+# Host platform for local development
+platform(
+    name = "darwin-x86_64",
+    constraint_values = [
+        "@platforms//os:osx",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+# Host platform for local development
+platform(
+    name = "darwin-aarch64",
+    constraint_values = [
+        "@platforms//os:osx",
+        "@platforms//cpu:aarch64",
+    ],
+)
+
+# MUSL platform for cross compilation
+platform(
+    name = "linux_x86_64_musl",
+    constraint_values = [
+        "@//build/linker_config:musl",
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+platform(
+    name = "linux_arm64_musl",
+    constraint_values = [
+        "@//build/linker_config:musl",
+        "@platforms//cpu:arm64",
+        "@platforms//os:linux",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Platform for cross compilation on CI.
+platform(
+    name = "linux-x86_64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    exec_properties = {"container-image": "docker://ghcr.io/marvin-hansen/rbe-custom/rbe:latest"},
+)
+
+# Platform for cross compilation on CI.
+platform(
+    name = "linux-aarch64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:aarch64",
+    ],
+    exec_properties = {"container-image": "docker://ghcr.io/marvin-hansen/rbe-custom/rbe:latest"},
+)
