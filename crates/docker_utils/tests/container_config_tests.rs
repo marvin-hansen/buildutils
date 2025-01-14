@@ -1,4 +1,4 @@
-use common_container::{ContainerConfig, WaitStrategy};
+use docker_utils::*;
 
 /// Creates a sample `ContainerConfig` for testing purposes.
 fn sample_container_config() -> ContainerConfig<'static> {

@@ -20,7 +20,6 @@ workspace = true
 
 [dependencies]
 # Internal crates
-common_container = {workspace = true}
 wait_utils = {workspace = true}
 # External crates
 tokio = {workspace = true}

@@ -1,5 +1,4 @@
-use common_container::{ContainerConfig, WaitStrategy};
-use docker_utils::DockerUtil;
+use docker_utils::{ContainerConfig, DockerUtil, WaitStrategy};
 
 fn get_test_container_config() -> ContainerConfig<'static> {
     ContainerConfig::new(

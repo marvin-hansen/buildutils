@@ -1,5 +1,4 @@
-use common_container::ContainerConfig;
-use wait_utils::WaitStrategy;
+use docker_utils::{ContainerConfig, WaitStrategy};
 
 pub(crate) fn postgres_db_container_config() -> ContainerConfig<'static> {
     // Ensure name matches exactly the generated name by the DockerUtil

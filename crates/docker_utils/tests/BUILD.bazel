@@ -1,9 +1,9 @@
 load("@rules_rust//rust:defs.bzl", "rust_test_suite")
 
 rust_test_suite(
-    name = "tests",
+    name = "integration_tests",
     srcs = glob([
-        "*_tests.rs",
+        "docker_util_tests.rs",
     ]),
     exec_properties = {
         # Tell BuildBuddy to run this test using a Firecracker microVM.
@@ -24,8 +24,23 @@ rust_test_suite(
         # Crate under test
         "//alias:docker_utils",
         # Internal crates
-        "//alias:common_container",
+
         # External crates
         "//thirdparty/crates:tokio",
+    ],
+)
+
+rust_test_suite(
+    name = "unit_tests",
+    srcs = glob([
+        "container_config_tests.rs",
+    ]),
+    tags = [
+        "unit-test",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        # Crate to test
+        "//alias:docker_utils",
     ],
 )

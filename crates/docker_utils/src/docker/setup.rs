@@ -1,5 +1,4 @@
-use crate::{DockerError, DockerUtil};
-use common_container::ContainerConfig;
+use crate::{ContainerConfig, DockerError, DockerUtil};
 
 impl DockerUtil {
     /// Sets up a Docker container based on the provided configuration, handling existence checks and version management.
