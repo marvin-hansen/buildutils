@@ -19,7 +19,6 @@ A friendly Rust crate that simplifies Docker container management with a clean a
 - 🔍 **Container Monitoring**
   - Check running containers
   - Verify container tags
-  - Monitor container startup status
 
 ## Quick Start
 
@@ -50,7 +49,7 @@ The crate uses a custom `DockerError` type for comprehensive error handling, mak
 ## Examples
 
 Check out the `example` directory for complete working examples, including:
-- PostgreSQL container setup and management
+- Postgres container setup and management
 - Container lifecycle management
 - Status monitoring
 
@@ -68,7 +67,7 @@ Contributions are welcome! Feel free to:
 - Improve documentation
 
 ## Licence
-This project is licensed under the [MIT license](LICENSE).
+This project is licensed under the [MIT license](../../LICENSE).
 
 ## Author
 * [Marvin Hansen](https://github.com/marvin-hansen)
