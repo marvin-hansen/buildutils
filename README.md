@@ -1,11 +1,12 @@
 # Build Utils
 
-
+Utils for CI tests with Bazel. Mostly used on BuildBuddy, but can easily be used locally or on any 
+other Bazel CI system. 
 
 ## Build commands
 
 Cargo build works as expected. However, Bazel is configured as primary build system for this project.
-Because not everyone is familiar with Bazel, I made a makefile to simplify all build related tasks.
+Because not everyone is familiar with Bazel, I made a makefile to simplify all bazel and build related tasks.
 
 ```text
     make build          Builds the code base incrementally (fast) for dev.
