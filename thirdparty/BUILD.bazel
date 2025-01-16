@@ -5,6 +5,12 @@ crates_vendor(
     annotations = {},
     mode = "local",
     packages = {
+        # Macro dependencies
+        "bon": crate.spec(
+            package = "bon",
+            version = "3.3",
+        ),
+        # Regular dependencies
         "tokio": crate.spec(
             default_features = False,
             features = [

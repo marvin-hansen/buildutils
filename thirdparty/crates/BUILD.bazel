@@ -31,6 +31,12 @@ filegroup(
 
 # Workspace Member Dependencies
 alias(
+    name = "bon",
+    actual = "//thirdparty/crates/bon-3.3.2:bon",
+    tags = ["manual"],
+)
+
+alias(
     name = "tokio",
     actual = "//thirdparty/crates/tokio-1.43.0:tokio",
     tags = ["manual"],
