@@ -10,13 +10,8 @@ impl ServiceUtil {
     ///
     /// # Returns
     ///
-    /// Returns a `ServiceUtilError` if waiting for the program fails.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the `WaitStrategy::WaitUntilConsoleOutputContains` is used,
-    /// as it is not supported.
-    ///
+    /// Returns a `ServiceUtilError` if waiting for the program fails or an unsupported wait strategy is used.
+    //
     pub(crate) async fn wait_for_program(
         &self,
         wait_strategy: &WaitStrategy,
@@ -30,7 +25,9 @@ impl ServiceUtil {
             }
 
             WaitStrategy::WaitUntilConsoleOutputContains(_, _) => {
-                panic!("WaitUntilConsoleOutputContains is not supported!");
+                return Err(ServiceUtilError::UnsupportedWaitStrategy(
+                    "WaitUntilConsoleOutputContains Strategy is not supported".into(),
+                ));
             }
 
             WaitStrategy::WaitForHttpHealthCheck(url, duration) => {
@@ -53,7 +50,7 @@ impl ServiceUtil {
             }
 
             WaitStrategy::NoWait => {
-                self.dbg_print("[start_container]: No wait. Return immediately.");
+                self.dbg_print("[start_container]: No wait. Return immediately.")
                 // Do nothing
             }
         };

@@ -49,10 +49,22 @@ impl ServiceUtil {
     ///
     pub async fn start_service(
         &self,
-        program: String,
+        program: &str,
         wait_strategy: &WaitStrategy,
         env_var: Option<EnvVar>,
     ) -> Result<(), ServiceUtilError> {
         self.start(program, wait_strategy, env_var).await
+    }
+
+    /// Stops a service.
+    ///
+    /// The `program` is the name of the program to stop.
+    ///
+    /// # Errors
+    ///
+    /// Fails if the service fails to stop.
+    ///
+    pub async fn stop_service(&self, program: &str) -> Result<(), ServiceUtilError> {
+        self.stop(program).await
     }
 }

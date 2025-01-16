@@ -1,4 +1,5 @@
-use crate::{verify, ServiceUtil, ServiceUtilError};
+use crate::service::verify::verify_binary_exists;
+use crate::{ServiceUtil, ServiceUtilError};
 
 impl ServiceUtil {
     pub(crate) async fn build(
@@ -10,12 +11,13 @@ impl ServiceUtil {
             println!("[ServiceUtil]: Debug mode enabled");
         }
 
-        verify::verify_binary_exists(dbg, root_path, &binaries)?;
+        verify_binary_exists(dbg, root_path, &binaries)?;
 
         Ok(ServiceUtil {
             dbg,
             root_path,
             binaries,
+            bin_pid_map: std::collections::HashMap::new(),
         })
     }
 }

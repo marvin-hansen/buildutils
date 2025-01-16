@@ -10,6 +10,7 @@ pub enum ServiceUtilError {
     ServiceStopFailed(String),
     ServiceNotSupported(String),
     ServiceNotRunning(String),
+    UnsupportedWaitStrategy(String),
     UnknownError(String),
 }
 
@@ -35,6 +36,9 @@ impl fmt::Display for ServiceUtilError {
             }
             Self::ServiceNotRunning(e) => {
                 write!(f, "[ServiceUtilError]: Service not running: {e}")
+            }
+            Self::UnsupportedWaitStrategy(e) => {
+                write!(f, "[ServiceUtilError]: Unsupported wait strategy: {e}")
             }
             Self::UnknownError(e) => {
                 write!(f, "[ServiceUtilError]: Unknown error: {e}")

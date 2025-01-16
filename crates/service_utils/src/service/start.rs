@@ -5,7 +5,7 @@ use wait_utils::WaitStrategy;
 impl ServiceUtil {
     pub(crate) async fn start(
         &self,
-        program: String,
+        program: &str,
         wait_strategy: &WaitStrategy,
         env_var: Option<EnvVar>,
     ) -> Result<(), ServiceUtilError> {
@@ -43,4 +43,5 @@ impl ServiceUtil {
         self.dbg_print("Service started");
         Ok(())
     }
+
 }
