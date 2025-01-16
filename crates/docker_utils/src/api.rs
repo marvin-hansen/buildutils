@@ -8,7 +8,7 @@ impl DockerUtil {
     /// Returns a new instance of the `DockerUtil` struct with default values.
     ///
     pub fn new() -> Result<Self, DockerError> {
-        // see src/docker/mod.rs
+        // see src/docker/build.rs
         Self::build(false)
     }
 
@@ -19,7 +19,7 @@ impl DockerUtil {
     /// Returns a `Result` containing a new instance of the `DockerUtil` struct with debug mode enabled, or a `DockerError` if an error occurred.
     ///
     pub fn with_debug() -> Result<Self, DockerError> {
-        // see src/docker/mod.rs
+        // see src/docker/build.rs
         Self::build(true)
     }
 
@@ -71,6 +71,7 @@ impl DockerUtil {
         &self,
         container_config: &ContainerConfig<'_>,
     ) -> Result<(String, u16), DockerError> {
+        // see src/docker/setup.rs
         self.setup(container_config)
     }
 
@@ -89,6 +90,7 @@ impl DockerUtil {
         &self,
         container_config: &ContainerConfig,
     ) -> Result<(String, u16), DockerError> {
+        // see src/docker/start.rs
         self.get_or_start(container_config)
     }
 
@@ -103,6 +105,7 @@ impl DockerUtil {
     /// Returns `Ok(true)` if the container exists, `Ok(false)` if the container does not exist, or `Err(DockerError)` if an error occurred.
     ///
     pub fn check_if_container_is_running(&self, container_id: &str) -> Result<bool, DockerError> {
+        // see src/docker/check_running.rs
         self.check_running(container_id)
     }
 
@@ -117,6 +120,7 @@ impl DockerUtil {
     /// Returns `Ok(())` if the container was successfully stopped, or `Err(DockerError)` if an error occurred.
     ///
     pub fn stop_container(&self, container_id: &str) -> Result<(), DockerError> {
+        // see src/docker/stop.rs
         self.stop(container_id)
     }
 
@@ -145,6 +149,7 @@ impl DockerUtil {
         image: &str,
         platform: Option<&str>,
     ) -> Result<(), DockerError> {
+        // see src/docker/pull.rs
         self.pull(container_id, image, platform)
     }
 
@@ -165,6 +170,7 @@ impl DockerUtil {
     /// Returns a `DockerError` if there is an error executing the `docker system prune` command.
     ///
     pub fn prune_all_containers(&mut self) -> Result<(), DockerError> {
+        // see src/docker/prune.rs
         self.prune()
     }
 }
