@@ -117,7 +117,7 @@ Check out the `example` directory for complete working examples, including:
 ## Requirements
 
 - Docker daemon running on your system
-- Rust 2021 edition or later
+- Rust 1.80
 
 ## Contributing
 
