@@ -10,6 +10,7 @@ impl ServiceUtil {
         wait_strategy: WaitStrategy,
         env_var: Option<EnvVar>,
     ) -> Result<(), ServiceUtilError> {
+        // Obtain a write lock in the binary handlers hashmap
         let binary_handlers = &mut self
             .binary_handlers()
             .write()
@@ -45,6 +46,7 @@ impl ServiceUtil {
             let mut cmd = Command::new(bin);
             cmd.arg("&");
 
+            // Set optional environment variable
             if env_var.is_some() {
                 let (env, val) = env_var.unwrap().values();
                 cmd.env(env, val);
@@ -65,6 +67,7 @@ impl ServiceUtil {
         // Add the handler to the hashmap so it can be stopped later.
         binary_handlers.insert(program.to_owned(), handle);
 
+        // the write lock will be dropped automatically when it goes out of scope.
         Ok(())
     }
 }
