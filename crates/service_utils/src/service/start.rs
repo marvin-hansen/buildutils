@@ -1,3 +1,4 @@
+use crate::service::wait;
 use crate::{EnvVar, ServiceUtil, ServiceUtilError};
 use std::process::Command;
 use wait_utils::WaitStrategy;
@@ -6,42 +7,64 @@ impl ServiceUtil {
     pub(crate) async fn start(
         &self,
         program: &str,
-        wait_strategy: &WaitStrategy,
+        wait_strategy: WaitStrategy,
         env_var: Option<EnvVar>,
     ) -> Result<(), ServiceUtilError> {
-        // Set the program to be executable
-        Command::new("chmod")
-            .arg("+x")
-            .arg(&program)
-            .output()
-            .expect("Failed to set program to executable");
-        let mut cmd = Command::new("chmod");
-        cmd.arg("+x").arg(program.clone());
-        cmd.output().expect("Failed to set program to executable");
+        let binary_handlers = &mut self
+            .binary_handlers()
+            .write()
+            .expect("Failed to write to binary handlers");
 
-        self.dbg_print("Constructing start command");
-        let mut cmd = Command::new(program);
-        cmd.arg("&");
-
-        if env_var.is_some() {
-            self.dbg_print("Setting environment variables");
-            let (env, val) = env_var.unwrap().values();
-            cmd.env(env, val);
+        // Check if program is already running i.e in binary_handlers
+        if binary_handlers.contains_key(program) {
+            return Err(ServiceUtilError::ServiceAlreadyRunning(program.to_owned()));
         }
 
-        self.dbg_print(&format!("Run start command: {:?}", &cmd));
-        cmd.spawn()
-            .expect("Failed to run command")
-            .wait()
-            .expect("Failed to wait for command");
+        // Check if the program is in the binaries vector
+        if !self.binaries().contains(&program) {
+            return Err(ServiceUtilError::BinaryNotFound(program.to_owned()));
+        }
 
-        self.dbg_print("Waiting for service to start");
-        self.wait_for_program(wait_strategy)
-            .await
-            .expect("Failed to wait for program");
+        // Check if the binary in the full path still exists
+        let bin = format!("{}/{}", self.root_path, program);
+        if !std::path::Path::new(&bin).exists() {
+            return Err(ServiceUtilError::BinaryNotFound(program.to_owned()));
+        }
 
-        self.dbg_print("Service started");
+        // Start the program
+        let dbg = self.dbg;
+        let handle = tokio::spawn(async move {
+            // Set the program to be executable
+            Command::new("chmod")
+                .arg("+x")
+                .arg(&bin)
+                .output()
+                .expect("Failed to set program to executable");
+
+            // Run the program
+            let mut cmd = Command::new(bin);
+            cmd.arg("&");
+
+            if env_var.is_some() {
+                let (env, val) = env_var.unwrap().values();
+                cmd.env(env, val);
+            }
+
+            // Spawn a new task to run the program
+            cmd.spawn()
+                .expect("Failed to run command")
+                .wait()
+                .expect("Failed to wait for command");
+
+            // Wait for the program based on the wait strategy
+            wait::wait_for_program(dbg, &wait_strategy)
+                .await
+                .expect("Failed to wait for program");
+        });
+
+        // Add the handler to the hashmap so it can be stopped later.
+        binary_handlers.insert(program.to_owned(), handle);
+
         Ok(())
     }
-
 }

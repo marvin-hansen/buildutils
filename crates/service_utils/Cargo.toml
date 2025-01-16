@@ -17,4 +17,4 @@ workspace = true
 # Internal crates
 wait_utils = {workspace = true}
 # External crates
-# tokio = { workspace = true }
+tokio = { workspace = true }

@@ -6,6 +6,7 @@ use std::fmt::Formatter;
 pub enum ServiceUtilError {
     BinaryNotFound(String),
     ServiceStartFailed(String),
+    ServiceAlreadyRunning(String),
     ServiceHealthcheckFailed(String),
     ServiceStopFailed(String),
     ServiceNotSupported(String),
@@ -24,6 +25,9 @@ impl fmt::Display for ServiceUtilError {
             }
             Self::ServiceStartFailed(e) => {
                 write!(f, "[ServiceUtilError]: Service start failed: {e}")
+            }
+            Self::ServiceAlreadyRunning(e) => {
+                write!(f, "[ServiceUtilError]: Service already running: {e}")
             }
             Self::ServiceHealthcheckFailed(e) => {
                 write!(f, "[ServiceUtilError]: Service healthcheck failed: {e}")

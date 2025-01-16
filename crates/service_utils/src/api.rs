@@ -53,7 +53,7 @@ impl ServiceUtil {
         wait_strategy: &WaitStrategy,
         env_var: Option<EnvVar>,
     ) -> Result<(), ServiceUtilError> {
-        self.start(program, wait_strategy, env_var).await
+        self.start(program, wait_strategy.to_owned(), env_var).await
     }
 
     /// Stops a service.
@@ -66,5 +66,15 @@ impl ServiceUtil {
     ///
     pub async fn stop_service(&self, program: &str) -> Result<(), ServiceUtilError> {
         self.stop(program).await
+    }
+
+    /// Stops all services.
+    ///
+    /// # Errors
+    ///
+    /// Fails if any of the services fail to stop.
+    ///
+    pub async fn stop_all_service(&self) -> Result<(), ServiceUtilError> {
+        self.stop_all().await
     }
 }
