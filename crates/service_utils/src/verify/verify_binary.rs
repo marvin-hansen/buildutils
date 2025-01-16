@@ -5,6 +5,10 @@ pub(crate) fn verify_binary_exists(
     root_path: &'static str,
     binaries: &Vec<&'static str>,
 ) -> Result<(), ServiceUtilError> {
+    if dbg {
+        println!("[ServiceUtil]: Verify all binaries in path: {root_path}");
+    }
+
     for b in binaries {
         let path = format!("{root_path}/{b}");
         if dbg {
