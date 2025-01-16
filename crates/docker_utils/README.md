@@ -34,7 +34,7 @@ let container_config = postgres_config::postgres_db_container_config();
 
 // Start the container or get it if it already running. Returns (container_name, port)
 let (container_name, port) = docker_util
-    .get_or_start_container_config(&container_config)
+    .setup_container(&container_config)
     .expect("Failed to start container");
 
 // Stop the container when done

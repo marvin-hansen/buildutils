@@ -3,23 +3,6 @@ use std::process::Command;
 use wait_utils::WaitStrategy;
 
 impl DockerUtil {
-    /// Gets an existing container or starts a new one with the specified configuration
-    ///
-    /// # Arguments
-    ///
-    /// * `container_config` - The configuration of the container.
-    ///
-    /// # Returns
-    ///
-    /// Returns a tuple containing the container name and port if successful,
-    /// or a `DockerError` if an error occurs.
-    ///
-    pub fn get_or_start_container_config(
-        &self,
-        container_config: &ContainerConfig,
-    ) -> Result<(String, u16), DockerError> {
-        self.get_or_start_container(container_config)
-    }
 
     /// Gets an existing container or starts a new one with the specified name, image, port, and reuse status.
     ///
@@ -34,7 +17,7 @@ impl DockerUtil {
     ///
     /// Returns a tuple containing the container name and port if successful, or a `DockerError` if an error occurs.
     ///
-    fn get_or_start_container(
+    pub(crate) fn get_or_start(
         &self,
         container_config: &ContainerConfig,
     ) -> Result<(String, u16), DockerError> {

@@ -1,6 +1,7 @@
 mod container_config;
 mod docker;
 mod error;
+mod api;
 
 // Re-exports
 pub use crate::container_config::*;

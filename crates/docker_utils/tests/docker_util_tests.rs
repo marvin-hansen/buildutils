@@ -63,7 +63,7 @@ async fn test_start_container(
 ) {
     println!("test_start_container");
 
-    let res = docker_util.get_or_start_container_config(container_config);
+    let res = docker_util.get_or_start_container(container_config);
     assert!(res.is_ok());
 
     let (container_id, container_port) = res.unwrap();

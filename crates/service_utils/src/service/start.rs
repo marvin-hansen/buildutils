@@ -33,7 +33,7 @@ impl ServiceUtil {
         cmd.spawn()
             .expect("Failed to run command")
             .wait()
-            .expect("TODO: panic message");
+            .expect("Failed to wait for command");
 
         self.dbg_print("Waiting for service to start");
         self.wait_for_program(wait_strategy)

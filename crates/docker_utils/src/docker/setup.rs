@@ -1,52 +1,8 @@
 use crate::{ContainerConfig, DockerError, DockerUtil};
 
 impl DockerUtil {
-    /// Sets up a Docker container based on the provided configuration, handling existence checks and version management.
-    ///
-    /// # Arguments
-    ///
-    /// * `self` - Reference to the `DockerUtil` instance
-    /// * `container_config` - Reference to a `ContainerConfig` containing the container configuration:
-    ///   - Container name
-    ///   - Image tag
-    ///   - Other container-specific settings
-    ///
-    /// # Returns
-    ///
-    /// Returns a `Result<(String, u16), DockerError>`:
-    /// * `Ok((container_name, port))` - A tuple containing:
-    ///   - `container_name`: String - The name of the running container
-    ///   - `port`: u16 - The exposed port number of the container
-    /// * `Err(DockerError)` - If any Docker operation fails
-    ///
-    /// # Errors
-    ///
-    /// Returns a `DockerError` if:
-    /// * Container existence check fails
-    /// * Container tag verification fails
-    /// * Container stop operation fails (when tag mismatch)
-    /// * Container start operation fails
-    /// * Port mapping operation fails
-    /// * Docker API communication fails
-    ///
-    /// # Panics
-    ///
-    /// This function will panic if:
-    /// * Container existence check critically fails
-    /// * Tag verification critically fails
-    /// * Container stop operation critically fails
-    /// * Container setup critically fails
-    ///
-    /// # Implementation Notes
-    ///
-    /// This function performs the following steps:
-    /// 1. Checks if a container with the given name already exists
-    /// 2. If exists, verifies if it uses the target tag
-    /// 3. If tag mismatch, stops the existing container
-    /// 4. Creates or reuses the container with correct configuration
-    /// 5. Returns the container name and exposed port
-    ///
-    pub async fn setup_container(
+
+    pub(crate) fn setup(
         &self,
         container_config: &ContainerConfig<'_>,
     ) -> Result<(String, u16), DockerError> {
@@ -90,7 +46,7 @@ impl DockerUtil {
         }
 
         let (container_name, container_port) = self
-            .get_or_start_container_config(container_config)
+            .get_or_start(container_config)
             .unwrap_or_else(|_| {
                 panic!("[TestEnv/CI:setup_container]: Failed to setup container: {container_name}")
             });
