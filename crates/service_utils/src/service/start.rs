@@ -12,9 +12,9 @@ impl ServiceUtil {
     ) -> Result<(), ServiceUtilError> {
         // Obtain a write lock in the binary handlers hashmap
         let binary_handlers = &mut self
-            .binary_handlers()
+            .binary_handlers
             .write()
-            .expect("Failed to write to binary handlers");
+            .expect("Failed to obtain a write lock to binary handlers");
 
         // Check if program is already running i.e in binary_handlers
         if binary_handlers.contains_key(program) {
@@ -27,7 +27,7 @@ impl ServiceUtil {
         }
 
         // Check if the binary in the full path still exists
-        let bin = format!("{}/{}", self.root_path, program);
+        let bin = format!("{}/{}", self.root_path(), program);
         if !std::path::Path::new(&bin).exists() {
             return Err(ServiceUtilError::BinaryNotFound(program.to_owned()));
         }

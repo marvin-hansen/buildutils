@@ -5,7 +5,7 @@ impl ServiceUtil {
         let handlers = &mut self
             .binary_handlers
             .write()
-            .expect("Failed to write to binary handlers");
+            .expect("Failed to obtain a write lock to binary handlers");
 
         if handlers.is_empty() {
             return Ok(());
@@ -24,7 +24,7 @@ impl ServiceUtil {
         let handlers = &mut self
             .binary_handlers
             .write()
-            .expect("Failed to write to binary handlers");
+            .expect("Failed to obtain a write lock to binary handlers");
 
         // Check if there are any handlers; if not, return
         if handlers.is_empty() {
