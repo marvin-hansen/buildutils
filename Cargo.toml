@@ -49,6 +49,10 @@ wait_utils = { path = "crates/wait_utils" }
 # ==============
 # External crates
 # ==============
+# Macro dependencies
+# https://github.com/elastio/bon
+bon = {version = "3.3"}
+# Regular dependencies
 tokio = { version = "1.42", default-features = false, features = ["macros", "net", "rt-multi-thread", "signal", "time"] }
 tonic = { version = "0.12.1", features = ["transport"] }
 tonic-health = { version = "0.12.3", default-features = false, features = ["transport"] }

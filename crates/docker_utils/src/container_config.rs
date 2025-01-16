@@ -1,18 +1,40 @@
 use std::fmt::Display;
 use wait_utils::WaitStrategy;
+// https://github.com/elastio/bon
+use bon::Builder;
 
-#[derive(Debug, Default, Clone, Eq, PartialOrd, Ord, PartialEq, Hash)]
+/// Create a new instance of the `ContainerConfig` struct with the given parameters.
+///
+/// Examples
+///
+/// Creating a new configuration using the derived builder:
+/// ```rust
+///  use docker_utils::*;
+///
+///     let config = ContainerConfig::builder()
+///         .name("test_container")
+///         .image("test_image")
+///         .tag("latest")
+///         .url("0.0.0.0")
+///         .connection_port(8080)
+///         .reuse_container(true)
+///         .keep_configuration(true)
+///         .wait_strategy(WaitStrategy::NoWait)
+///         .build();
+/// ```
+///
+#[derive(Builder, Debug, Default, Clone, Eq, PartialOrd, Ord, PartialEq, Hash)]
 pub struct ContainerConfig<'l> {
     name: &'l str,
     image: &'l str,
     tag: &'l str,
     url: &'l str,
     connection_port: u16,
+    reuse_container: bool,
+    keep_configuration: bool,
     additional_ports: Option<&'l [u16]>,
     additional_env_vars: Option<&'l [&'l str]>,
     platform: Option<&'l str>,
-    reuse_container: bool,
-    keep_configuration: bool,
     wait_strategy: WaitStrategy,
 }
 
@@ -33,6 +55,27 @@ impl<'l> ContainerConfig<'l> {
     ///    every environment setup. If set to true, the same configuration will be used across all
     ///    environment setups. If false, each setup will re-create all tables and import data.,
     /// * `wait_strategy` - The wait strategy to use for the container.
+    ///
+    /// Examples
+    ///
+    /// Creating a new configuration using the constructor:
+    /// ```rust
+    /// use docker_utils::*;
+    ///
+    ///     let config =  ContainerConfig::new(
+    ///         "test_container",
+    ///         "test_image",
+    ///         "latest",
+    ///         "0.0.0.0",
+    ///         8080,
+    ///         Some(&[8081, 8082]),
+    ///         Some(&["ENV_VAR=VALUE", "DEBUG=true"]),
+    ///         Some("linux/amd64"),
+    ///         true,
+    ///         false,
+    ///         WaitStrategy::default(), // NoWait is the default wait strategy
+    ///     );
+    /// ```
     ///
     /// # Returns
     ///
@@ -58,11 +101,11 @@ impl<'l> ContainerConfig<'l> {
             tag,
             url,
             connection_port,
+            reuse_container,
+            keep_configuration,
             additional_ports,
             additional_env_vars,
             platform,
-            reuse_container,
-            keep_configuration,
             wait_strategy,
         }
     }
@@ -81,7 +124,6 @@ impl<'l> ContainerConfig<'l> {
     pub fn container_name(&self) -> String {
         format!("{}-{}", self.name, self.connection_port)
     }
-
     #[inline]
     pub const fn url(&self) -> &'l str {
         self.url

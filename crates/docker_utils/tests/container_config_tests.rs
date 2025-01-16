@@ -18,6 +18,33 @@ fn sample_container_config() -> ContainerConfig<'static> {
 }
 
 #[test]
+fn test_builder() {
+    let config = ContainerConfig::builder()
+        .name("test_container")
+        .image("test_image")
+        .tag("latest")
+        .url("0.0.0.0")
+        .connection_port(8080)
+        .reuse_container(true)
+        .keep_configuration(true)
+        .wait_strategy(WaitStrategy::NoWait)
+        .build();
+
+    // assert
+    assert_eq!(config.name(), "test_container");
+    assert_eq!(config.container_image(), "test_image:latest");
+    assert_eq!(config.container_name(), "test_container-8080");
+    assert_eq!(config.url(), "0.0.0.0");
+    assert_eq!(config.connection_port(), 8080);
+    assert_eq!(config.additional_ports(), None);
+    assert_eq!(config.additional_env_vars(), None);
+    assert_eq!(config.platform(), None);
+    assert!(config.reuse_container());
+    assert!(config.keep_configuration());
+    assert_eq!(config.wait_strategy(), &WaitStrategy::NoWait);
+}
+
+#[test]
 fn test_name() {
     let config = sample_container_config();
     assert_eq!(config.name(), "test_container");

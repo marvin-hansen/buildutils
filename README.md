@@ -14,9 +14,14 @@ A friendly Rust crate that makes Docker container management a breeze! With dock
 
 Check out the [docker_utils documentation](crates/docker_utils/README.md) for detailed usage examples and API reference.
 
+## Users
+
+* DockerUtils powers thousands of CI test runs each month at Emet-labs.
+
+
 ## Build commands
 
-Cargo build commands for all crates work as expected. However, Bazel is configured 
+Cargo build work as expected for all crates. However, Bazel is configured 
 as primary build system for this project. Because not everyone is familiar with Bazel, 
 I made a makefile to simplify all bazel and build related tasks.
 

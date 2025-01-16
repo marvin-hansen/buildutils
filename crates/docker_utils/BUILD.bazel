@@ -16,6 +16,7 @@ rust_library(
         # Internal crates
         "//alias:wait_utils",
         # External crates
+        "//thirdparty/crates:bon",
         "//thirdparty/crates:tokio",
     ],
 )

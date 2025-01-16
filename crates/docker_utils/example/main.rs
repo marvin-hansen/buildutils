@@ -4,9 +4,7 @@ use std::fmt::Error;
 mod postgres_config;
 
 pub fn main() -> Result<(), Error> {
-    let res = DockerUtil::new();
-    assert!(res.is_ok());
-    let docker_util = res.unwrap();
+    let docker_util = DockerUtil::new().expect("Failed to create DockerUtil");
     let container_config = postgres_config::postgres_db_container_config();
     let container_id = "postgres-5432";
 

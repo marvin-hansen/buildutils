@@ -7,6 +7,18 @@ impl DockerUtil {
     ///
     /// Returns a new instance of the `DockerUtil` struct with default values.
     ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use docker_utils::{DockerUtil, ContainerConfig};
+    /// use wait_utils::WaitStrategy;
+    ///
+    /// fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let docker = DockerUtil::new()?;
+    ///     Ok(())
+    /// }
+    /// ```
+    ///
     pub fn new() -> Result<Self, DockerError> {
         // see src/docker/build.rs
         Self::build(false)
@@ -17,6 +29,18 @@ impl DockerUtil {
     /// # Returns
     ///
     /// Returns a `Result` containing a new instance of the `DockerUtil` struct with debug mode enabled, or a `DockerError` if an error occurred.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use docker_utils::{DockerUtil, ContainerConfig};
+    /// use wait_utils::WaitStrategy;
+    ///
+    /// fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let docker = DockerUtil::with_debug()?;
+    ///     Ok(())
+    /// }
+    /// ```
     ///
     pub fn with_debug() -> Result<Self, DockerError> {
         // see src/docker/build.rs
@@ -39,6 +63,38 @@ impl DockerUtil {
     ///   - `container_name`: String - The name of the running container
     ///   - `port`: u16 - The exposed port number of the container
     /// * `Err(DockerError)` - If any Docker operation fails
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use docker_utils::{DockerUtil, ContainerConfig};
+    /// use wait_utils::WaitStrategy;
+    ///
+    /// fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let docker = DockerUtil::new()?;
+    ///     
+    ///     let config = ContainerConfig::new(
+    ///         "postgres",
+    ///         "postgres",
+    ///         "14",
+    ///         "0.0.0.0",
+    ///         5432,
+    ///         None,
+    ///         Some(&["POSTGRES_PASSWORD=secret"]),
+    ///         None,
+    ///         true,
+    ///         false,
+    ///         WaitStrategy::WaitUntilConsoleOutputContains(
+    ///             "PostgreSQL init process complete; ready for start up.".to_string(),
+    ///             15,
+    ///         ),
+    ///     );
+    ///     
+    ///     let (container_name, port) = docker.setup_container(&config)?;
+    ///     println!("Container {} running on port {}", container_name, port);
+    ///     Ok(())
+    /// }
+    /// ```
     ///
     /// # Errors
     ///
@@ -86,6 +142,35 @@ impl DockerUtil {
     /// Returns a tuple containing the container name and port if successful,
     /// or a `DockerError` if an error occurs.
     ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use docker_utils::{DockerUtil, ContainerConfig};
+    /// use wait_utils::WaitStrategy;
+    ///
+    /// fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let docker = DockerUtil::new()?;
+    ///     
+    ///     let config = ContainerConfig::new(
+    ///         "redis",
+    ///         "redis",
+    ///         "latest",
+    ///         "0.0.0.0",
+    ///         6379,
+    ///         None,
+    ///         None,
+    ///         None,
+    ///         true,
+    ///         false,
+    ///         WaitStrategy::default(),
+    ///     );
+    ///     
+    ///     let (container_name, port) = docker.get_or_start_container(&config)?;
+    ///     println!("Redis container {} available on port {}", container_name, port);
+    ///     Ok(())
+    /// }
+    /// ```
+    ///
     pub fn get_or_start_container(
         &self,
         container_config: &ContainerConfig,
@@ -104,6 +189,23 @@ impl DockerUtil {
     ///
     /// Returns `Ok(true)` if the container exists, `Ok(false)` if the container does not exist, or `Err(DockerError)` if an error occurred.
     ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use docker_utils::DockerUtil;
+    ///
+    /// fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let docker = DockerUtil::new()?;
+    ///     
+    ///     let container_id = "redis-6379";  // Example container ID
+    ///     match docker.check_if_container_is_running(container_id)? {
+    ///         true => println!("Container {} is running", container_id),
+    ///         false => println!("Container {} is not running", container_id),
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    ///
     pub fn check_if_container_is_running(&self, container_id: &str) -> Result<bool, DockerError> {
         // see src/docker/check_running.rs
         self.check_running(container_id)
@@ -119,6 +221,21 @@ impl DockerUtil {
     ///
     /// Returns `Ok(())` if the container was successfully stopped, or `Err(DockerError)` if an error occurred.
     ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use docker_utils::DockerUtil;
+    ///
+    /// fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let docker = DockerUtil::new()?;
+    ///     
+    ///     let container_id = "redis-6379";  // Example container ID
+    ///     docker.stop_container(container_id)?;
+    ///     println!("Container {} stopped successfully", container_id);
+    ///     Ok(())
+    /// }
+    /// ```
+    ///
     pub fn stop_container(&self, container_id: &str) -> Result<(), DockerError> {
         // see src/docker/stop.rs
         self.stop(container_id)
@@ -130,7 +247,6 @@ impl DockerUtil {
     ///
     /// # Arguments
     ///
-    /// * `&self` - A reference to the `DockerUtil` object.
     /// * `container_id` - The ID of the container to start.
     /// * `image` - The container image with tag.
     /// * `platform` - Optional platform tag, such as linux/amd64.
@@ -138,6 +254,32 @@ impl DockerUtil {
     /// # Returns
     ///
     /// * `Result<(), DockerError>` - Returns `Ok(())` if the image is pulled successfully, or an `Err` containing the error if it fails.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use docker_utils::DockerUtil;
+    ///
+    /// fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let docker = DockerUtil::new()?;
+    ///     
+    ///     // Pull image for specific platform
+    ///     docker.pull_container_image(
+    ///         "nginx-container",
+    ///         "nginx:latest",
+    ///         Some("linux/amd64")
+    ///     )?;
+    ///     
+    ///     // Pull image without platform specification
+    ///     docker.pull_container_image(
+    ///         "redis-container",
+    ///         "redis:latest",
+    ///         None
+    ///     )?;
+    ///     
+    ///     Ok(())
+    /// }
+    /// ```
     ///
     /// # Errors
     ///
@@ -157,13 +299,24 @@ impl DockerUtil {
     ///
     /// This method executes the `docker system prune` command with the `--all` and `--force` options to remove all stopped containers, their associated volumes, and networks.
     ///
-    /// # Arguments
-    ///
-    /// * `&mut self` - A mutable reference to the `DockerUtil` object.
-    ///
     /// # Returns
     ///
     /// * `Result<(), DockerError>` - Returns `Ok(())` if the containers are pruned successfully, or an `Err` containing the error if it fails.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use docker_utils::DockerUtil;
+    ///
+    /// fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let mut docker = DockerUtil::new()?;
+    ///     
+    ///     // Clean up all stopped containers and their resources
+    ///     docker.prune_all_containers()?;
+    ///     println!("Successfully pruned all stopped containers");
+    ///     Ok(())
+    /// }
+    /// ```
     ///
     /// # Errors
     ///
