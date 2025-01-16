@@ -2,6 +2,20 @@
 
 A friendly Rust crate that simplifies Docker container management with a clean and intuitive API.
 
+## Why?
+
+Docker is a powerful tool to manage and deploy containers. During continuous integration (CI),
+you may have to start containers, stop containers, or check the status of containers and all of that programmatically. 
+Conventionally, you can either rely on GitHub actions or you can use the wonderful [Testcontainers library](https://testcontainers.com/). 
+
+ 
+However, when you build your Rust project with Bazel, you cannot use GitHub actions and when accelerating your 
+build with Bazel's Remote Build Execution, you cannot always use Testcontainers.
+
+
+With Docker Utils, you can easily manage your containers with a clean and intuitive API for all your Bazel CI test and any
+other situation where you have to work with disposable containers. Docker Utils gives you the fun without the fuzz. 
+
 ## Features
 
 - 🐳 **Easy Docker API**
