@@ -8,6 +8,7 @@ mod display;
 mod getters;
 mod start;
 mod stop;
+mod stop_all;
 mod verify;
 mod wait;
 

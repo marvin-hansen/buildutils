@@ -1,20 +1,20 @@
 use crate::{ServiceUtil, ServiceUtilError};
 
 impl ServiceUtil {
-    pub(crate) async fn stop(&self, program: &str) -> Result<(), ServiceUtilError> {
+    pub(crate) async fn stop_all(&self) -> Result<(), ServiceUtilError> {
         let handlers = &mut self
             .binary_handlers
             .write()
             .expect("Failed to obtain a write lock to binary handlers");
 
+        // Check if there are any handlers; if not, return
         if handlers.is_empty() {
             return Ok(());
-        }
+        };
 
-        if handlers.contains_key(program) {
-            let handler = handlers.get(program).expect("Failed to get handler");
+        // Abort all handlers and clear the map
+        for (_, handler) in handlers.drain() {
             handler.abort();
-            handlers.remove(program);
         }
 
         Ok(())
