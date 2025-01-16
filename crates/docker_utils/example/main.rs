@@ -4,8 +4,7 @@ use std::fmt::Error;
 mod postgres_config;
 
 pub fn main() -> Result<(), Error> {
-
-    let res = DockerUtil::with_debug();
+    let res = DockerUtil::new();
     assert!(res.is_ok());
     let docker_util = res.unwrap();
     let container_config = postgres_config::postgres_db_container_config();
@@ -22,7 +21,7 @@ pub fn main() -> Result<(), Error> {
     Ok(())
 }
 
- fn start_container(
+fn start_container(
     docker_util: &DockerUtil,
     container_config: &ContainerConfig<'static>,
     expected_container_id: &str,
@@ -39,7 +38,7 @@ pub fn main() -> Result<(), Error> {
     println!("container started: {}", container_id);
 }
 
- fn container_is_running(docker_util: &DockerUtil, container_id: &str) {
+fn container_is_running(docker_util: &DockerUtil, container_id: &str) {
     println!("container_is_running");
 
     let res = docker_util.check_if_container_is_running(container_id);
@@ -48,7 +47,7 @@ pub fn main() -> Result<(), Error> {
     println!("container exists: {}", container_id);
 }
 
- fn stop_container(docker_util: &DockerUtil, container_id: &str) {
+fn stop_container(docker_util: &DockerUtil, container_id: &str) {
     println!("test_stop_container");
 
     let res = docker_util.stop_container(container_id);
@@ -61,7 +60,7 @@ pub fn main() -> Result<(), Error> {
     println!("container stopped: {}", container_id);
 }
 
- fn container_deleted(docker_util: &DockerUtil, container_id: &str) {
+fn container_deleted(docker_util: &DockerUtil, container_id: &str) {
     println!("test_container_deleted");
 
     let res = docker_util.check_if_container_is_running(container_id);

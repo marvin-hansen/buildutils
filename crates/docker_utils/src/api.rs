@@ -8,6 +8,7 @@ impl DockerUtil {
     /// Returns a new instance of the `DockerUtil` struct with default values.
     ///
     pub fn new() -> Result<Self, DockerError> {
+        // see src/docker/mod.rs
         Self::build(false)
     }
 
@@ -18,6 +19,7 @@ impl DockerUtil {
     /// Returns a `Result` containing a new instance of the `DockerUtil` struct with debug mode enabled, or a `DockerError` if an error occurred.
     ///
     pub fn with_debug() -> Result<Self, DockerError> {
+        // see src/docker/mod.rs
         Self::build(true)
     }
 

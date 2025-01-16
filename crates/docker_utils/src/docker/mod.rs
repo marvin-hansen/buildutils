@@ -1,12 +1,14 @@
 use crate::DockerError;
-use std::process::Command;
+use std::process::{exit, Command};
 
 mod setup;
 mod start;
 mod stop;
 
+mod build;
 mod check_running;
 mod dbg;
+mod default;
 mod prune;
 mod pull;
 mod utils;
@@ -17,37 +19,32 @@ pub struct DockerUtil {
 }
 
 impl DockerUtil {
-    /// Build a new instance of the `DockerUtil` struct with the given debug flag.
+    /// Builds a new DockerUtil instance.
     ///
-    /// # Arguments
-    ///
-    /// * `dbg` - A boolean flag indicating whether to enable debug mode.
-    ///
-    /// # Returns
-    ///
-    /// Returns a `Result` containing a new instance of the `DockerUtil` struct if successful, or a `DockerError` if an error occurred.
-    ///
+    /// Checks if Docker is running before returning the instance.
+    /// If Docker is not running, it prints an error message and exits the program.
     pub(crate) fn build(dbg: bool) -> Result<Self, DockerError> {
-
         let mut cmd = Command::new("docker");
-        cmd.arg("info");
+        cmd.arg("ps");
 
-        match cmd.status(){
-            Ok(_) => {
-                if dbg {
-                    println!("[DockerUtil]: Docker is running");
-                }
+        if cmd.status().unwrap().success() {
+            if dbg {
+                println!("[DockerUtil]: Docker is running");
             }
-            Err(_) => {
-                panic!("🚨Failed to connect to docker. Is Docker running?🚨")
-            }
+        } else {
+            println!();
+            println!(" ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️");
+            println!("🚨🚨🚨 DockerUtil: Mayday Mayday 🚨🚨🚨");
+            println!(" ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️");
+            println!("🚨🚨🚨 Cannot connect to Docker  🚨🚨🚨");
+            println!("🚨🚨🚨 Is Docker up & running?   🚨🚨🚨");
+            println!(" ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️");
+            println!("🚨🚨🚨 Help guide & documentation 🚨🚨🚨");
+            println!("Install Docker: https://docs.docker.com/engine/install/");
+            println!("Install Obstack: https://docs.orbstack.dev/quick-start");
+            exit(42)
         }
-        Ok(Self { dbg })
-    }
-}
 
-impl Default for DockerUtil {
-    fn default() -> Self {
-        Self::new().expect("Failed to create DockerUtil")
+        Ok(Self { dbg })
     }
 }

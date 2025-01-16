@@ -1,8 +1,6 @@
 use crate::{DockerError, DockerUtil};
 
 impl DockerUtil {
-
-
     /// Check if a container is running
     ///
     /// # Arguments

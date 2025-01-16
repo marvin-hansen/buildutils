@@ -1,8 +1,23 @@
-use std::process::Command;
 use crate::{DockerError, DockerUtil};
+use std::process::Command;
 
-impl DockerUtil{
-
+impl DockerUtil {
+    /// Pull a container image from a specified registry.
+    ///
+    /// # Arguments
+    ///
+    /// * `container_id` - The ID of the container to pull the image for.
+    /// * `image` - The container image with tag.
+    /// * `platform` - Optional platform tag, such as linux/amd64.
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result` containing `Ok(())` if the image is pulled successfully, or an `Err` containing the error if it fails.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DockerError` if there is an error pulling the container image.
+    ///
     pub(crate) fn pull(
         &self,
         container_id: &str,
@@ -58,5 +73,4 @@ impl DockerUtil{
             }
         }
     }
-
 }

@@ -3,7 +3,6 @@ use std::process::Command;
 use wait_utils::WaitStrategy;
 
 impl DockerUtil {
-
     /// Gets an existing container or starts a new one with the specified name, image, port, and reuse status.
     ///
     /// # Arguments

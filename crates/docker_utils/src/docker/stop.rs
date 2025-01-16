@@ -3,6 +3,16 @@ use crate::{DockerError, DockerUtil};
 use std::process::Command;
 
 impl DockerUtil {
+    /// Stop a container
+    ///
+    /// # Arguments
+    ///
+    /// * `container_id` - The ID of the container to stop.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` if the container was successfully stopped, or `Err(DockerError)` if an error occurred.
+    ///
     pub(crate) fn stop(&self, container_id: &str) -> Result<(), DockerError> {
         self.dbg_print("[stop_container]: Check if container exists.");
         let exists = self
