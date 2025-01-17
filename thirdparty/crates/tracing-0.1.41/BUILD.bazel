@@ -31,6 +31,7 @@ rust_library(
     crate_features = [
         "attributes",
         "default",
+        "log",
         "std",
         "tracing-attributes",
     ],
@@ -88,6 +89,7 @@ rust_library(
     }),
     version = "0.1.41",
     deps = [
+        "//thirdparty/crates/log-0.4.25:log",
         "//thirdparty/crates/pin-project-lite-0.2.16:pin_project_lite",
         "//thirdparty/crates/tracing-core-0.1.33:tracing_core",
     ],

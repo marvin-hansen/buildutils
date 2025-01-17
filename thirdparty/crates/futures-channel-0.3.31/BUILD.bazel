@@ -31,6 +31,8 @@ rust_library(
     crate_features = [
         "alloc",
         "default",
+        "futures-sink",
+        "sink",
         "std",
     ],
     crate_root = "src/lib.rs",
@@ -85,5 +87,6 @@ rust_library(
     version = "0.3.31",
     deps = [
         "//thirdparty/crates/futures-core-0.3.31:futures_core",
+        "//thirdparty/crates/futures-sink-0.3.31:futures_sink",
     ],
 )

@@ -11,6 +11,11 @@ crates_vendor(
             version = "3.3",
         ),
         # Regular dependencies
+        "serde": crate.spec(
+            features = ["derive"],
+            package = "serde",
+            version = "1.0",
+        ),
         "tokio": crate.spec(
             default_features = False,
             features = [
@@ -28,15 +33,15 @@ crates_vendor(
             package = "tonic",
             version = "0.12",
         ),
-        "tonic-build": crate.spec(
-            package = "tonic-build",
-            version = "0.12",
-        ),
         "tonic-health": crate.spec(
             default_features = False,
             features = ["transport"],
             package = "tonic-health",
             version = "0.12",
+        ),
+        "warp": crate.spec(
+            package = "warp",
+            version = "0.3",
         ),
     },
     repository_name = "queng_vendored",

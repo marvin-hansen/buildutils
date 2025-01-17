@@ -30,6 +30,10 @@ rust_library(
     ),
     crate_features = [
         "alloc",
+        "futures-sink",
+        "sink",
+        "slab",
+        "std",
     ],
     crate_root = "src/lib.rs",
     edition = "2018",
@@ -83,8 +87,10 @@ rust_library(
     version = "0.3.31",
     deps = [
         "//thirdparty/crates/futures-core-0.3.31:futures_core",
+        "//thirdparty/crates/futures-sink-0.3.31:futures_sink",
         "//thirdparty/crates/futures-task-0.3.31:futures_task",
         "//thirdparty/crates/pin-project-lite-0.2.16:pin_project_lite",
         "//thirdparty/crates/pin-utils-0.1.0:pin_utils",
+        "//thirdparty/crates/slab-0.4.9:slab",
     ],
 )

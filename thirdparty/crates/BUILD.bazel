@@ -37,6 +37,12 @@ alias(
 )
 
 alias(
+    name = "serde",
+    actual = "//thirdparty/crates/serde-1.0.217:serde",
+    tags = ["manual"],
+)
+
+alias(
     name = "tokio",
     actual = "//thirdparty/crates/tokio-1.43.0:tokio",
     tags = ["manual"],
@@ -49,13 +55,13 @@ alias(
 )
 
 alias(
-    name = "tonic-build",
-    actual = "//thirdparty/crates/tonic-build-0.12.3:tonic_build",
+    name = "tonic-health",
+    actual = "//thirdparty/crates/tonic-health-0.12.3:tonic_health",
     tags = ["manual"],
 )
 
 alias(
-    name = "tonic-health",
-    actual = "//thirdparty/crates/tonic-health-0.12.3:tonic_health",
+    name = "warp",
+    actual = "//thirdparty/crates/warp-0.3.7:warp",
     tags = ["manual"],
 )
