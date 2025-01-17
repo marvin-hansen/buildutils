@@ -27,6 +27,13 @@ echo "=============="
 command bazel test //... --test_tag_filters=unit-test --test_env=ENV=LOCAL
 
 echo ""
+echo "=============="
+echo "Run Integration tests"
+echo "=============="
+
+command bazel test //... --test_tag_filters=integration-test --test_env=ENV=LOCAL
+
+echo ""
 echo "====================="
 echo "All Tests Passed"
 echo "====================="
