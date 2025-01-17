@@ -13,7 +13,11 @@ rust_binary(
     visibility = ["//visibility:public"],
     deps = [
         # Internal crates
-        "//alias:service_utils",
+        "//alias:docker_utils",
+        # External crates
+        "//thirdparty/crates:serde",
+        "//thirdparty/crates:tokio",
+        "//thirdparty/crates:warp",
     ],
 )
 

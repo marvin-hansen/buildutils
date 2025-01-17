@@ -19,3 +19,13 @@ alias(
     name = "wait_utils",
     actual = "//crates/wait_utils",
 )
+
+
+###############################################################################
+# Examples
+###############################################################################
+
+alias(
+    name = "service_utils_example",
+    actual = "//examples/service_utils_example",
+)
