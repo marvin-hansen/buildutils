@@ -16,6 +16,16 @@ crates_vendor(
             package = "serde",
             version = "1.0",
         ),
+        "reqwest": crate.spec(
+            default_features = False,
+            features = [
+                "rustls-tls",
+                "json",
+                "gzip",
+            ],
+            package = "reqwest",
+            version = "0.12",
+        ),
         "tokio": crate.spec(
             default_features = False,
             features = [

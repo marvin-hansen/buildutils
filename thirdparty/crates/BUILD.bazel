@@ -37,6 +37,12 @@ alias(
 )
 
 alias(
+    name = "reqwest",
+    actual = "//thirdparty/crates/reqwest-0.12.12:reqwest",
+    tags = ["manual"],
+)
+
+alias(
     name = "serde",
     actual = "//thirdparty/crates/serde-1.0.217:serde",
     tags = ["manual"],

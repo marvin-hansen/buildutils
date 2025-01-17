@@ -1,0 +1,20 @@
+[package]
+name = "service_example"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+readme.workspace = true
+repository.workspace = true
+authors.workspace = true
+license.workspace = true
+
+
+[dependencies]
+# External crates
+serde = { workspace = true}
+tokio = { workspace = true }
+warp = { workspace = true }
+
+
+[lints]
+workspace = true

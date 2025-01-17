@@ -28,6 +28,10 @@ rust_library(
             "WORKSPACE.bazel",
         ],
     ),
+    crate_features = [
+        "futures",
+        "futures-core",
+    ],
     crate_root = "src/lib.rs",
     edition = "2021",
     rustc_flags = [
@@ -78,4 +82,7 @@ rust_library(
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     version = "1.0.2",
+    deps = [
+        "//thirdparty/crates/futures-core-0.3.31:futures_core",
+    ],
 )
