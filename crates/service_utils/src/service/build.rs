@@ -1,7 +1,6 @@
 use crate::service::verify::verify_binary_exists;
 use crate::{ServiceUtil, ServiceUtilError};
-use std::collections::HashMap;
-use std::sync::RwLock;
+
 
 impl ServiceUtil {
     pub(crate) async fn build(
@@ -19,7 +18,6 @@ impl ServiceUtil {
             dbg,
             root_path,
             binaries,
-            binary_handlers: RwLock::new(HashMap::with_capacity(25)),
         })
     }
 }

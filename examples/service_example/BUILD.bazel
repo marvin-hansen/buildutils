@@ -1,13 +1,14 @@
-load("@rules_rust//rust:defs.bzl", "rust_doc", "rust_doc_test", "rust_binary")
+load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_doc", "rust_doc_test")
 
 rust_binary(
-    name = "service_utils_example",
+    name = "service_example",
     srcs = glob([
         "src/**",
     ]),
     crate_root = "src/main.rs",
     tags = [
-        "service_utils_example",
+        "service_example",
         "utils-test",
     ],
     visibility = ["//visibility:public"],
@@ -23,14 +24,14 @@ rust_binary(
 
 rust_doc(
     name = "doc",
-    crate = ":service_utils_example",
+    crate = ":service_example",
     tags = ["doc"],
     visibility = ["//visibility:public"],
 )
 
 rust_doc_test(
     name = "doc_test",
-    crate = ":service_utils_example",
+    crate = ":service_example",
     tags = ["doc-test"],
     visibility = ["//visibility:public"],
 )

@@ -1,3 +1,4 @@
+load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
 load("@rules_rust//rust:defs.bzl", "rust_test_suite")
 
 rust_test_suite(
@@ -5,16 +6,28 @@ rust_test_suite(
     srcs = glob([
         "*_tests.rs",
     ]),
+    data = [
+        ":copy_service",  # Copies the service binary into the test folder
+    ],
     tags = [
         "integration-test",
     ],
     visibility = ["//visibility:public"],
     deps = [
         # Crate under test
-        "//alias:service_utils_example",
+        "//alias:service_example",
         # Internal crates
         "//alias:service_utils",
         # External crates
+        "//thirdparty/crates:reqwest",
+        "//thirdparty/crates:serde",
         "//thirdparty/crates:tokio",
     ],
+)
+
+copy_file(
+    name = "copy_service",  # label to this rule. Used in the data attribute
+    src = "//alias:service_example",  # Alias is defined in file: alias/BUILD.bazel
+    out = "service",  # Name of the output binary
+    is_executable = True,  # Must always set to true otherwise the service cannot be started.
 )

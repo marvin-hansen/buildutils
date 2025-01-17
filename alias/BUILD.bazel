@@ -26,6 +26,6 @@ alias(
 ###############################################################################
 
 alias(
-    name = "service_utils_example",
-    actual = "//examples/service_utils_example",
+    name = "service_example",
+    actual = "//examples/service_example",
 )

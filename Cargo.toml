@@ -32,10 +32,12 @@ deprecated_safe_2024 = "warn"
 docker_utils = { path = "crates/docker_utils" }
 service_utils = { path = "crates/service_utils" }
 wait_utils = { path = "crates/wait_utils" }
+service_example = { path = "examples/service_example" }
 # ==============
 # External crates
 # ==============
 bon = {version = "3.3"}
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json", "gzip"] }
 serde = { version = "1.0",features = ["derive"]}
 tokio = { version = "1", default-features = false, features = ["macros", "net", "rt-multi-thread", "signal", "time"] }
 tonic = { version = "0.12.1", features = ["transport"] }

@@ -1,4 +1,3 @@
-use crate::service::wait;
 use crate::{ServiceStartConfig, ServiceUtil, ServiceUtilError};
 use std::process::Command;
 use wait_utils::WaitStrategy;
@@ -23,17 +22,6 @@ impl ServiceUtil {
         env_vars: Option<Vec<String>>,
         wait_strategy: WaitStrategy,
     ) -> Result<(), ServiceUtilError> {
-        // Obtain a write lock in the binary handlers hashmap
-        let binary_handlers = &mut self
-            .binary_handlers
-            .write()
-            .expect("Failed to obtain a write lock to binary handlers");
-
-        // Check if program is already running i.e in binary_handlers
-        if binary_handlers.contains_key(program) {
-            return Err(ServiceUtilError::ServiceAlreadyRunning(program.to_owned()));
-        }
-
         // Check if the program is in the binaries vector
         if !self.binaries().contains(&program) {
             return Err(ServiceUtilError::BinaryNotFound(format!("Binary has not been added to the ServiceUtil. \
@@ -49,46 +37,35 @@ impl ServiceUtil {
             )));
         }
 
-        // Start the program
-        let dbg = self.dbg;
-        let handle = tokio::spawn(async move {
-            // Set the program to be executable
-            Command::new("chmod")
-                .arg("+x")
-                .arg(&bin)
-                .output()
-                .expect("Failed to set program to executable");
+        self.dbg_print(" Set the program to be executable");
+        Command::new("chmod")
+            .arg("+x")
+            .arg(&bin)
+            .output()
+            .expect("Failed to set program to executable");
 
-            // Run the program
-            let mut cmd = Command::new(bin);
-            cmd.arg("&");
+        self.dbg_print("Constructing start command");
+        let mut cmd = Command::new(bin);
+        cmd.arg("&");
 
-            // Set optional environment variable if there are some.
-            if env_vars.is_some() {
-                // Unwrap the optional environment variable
-                let add_args = env_vars.unwrap();
+        if env_vars.is_some() {
+            self.dbg_print("Setting environment variables");
+            let add_args = env_vars.unwrap();
 
-                // Add env variables
-                cmd.arg("-e");
-                cmd.args(add_args);
-            }
+            // Add env variables
+            cmd.arg("-e");
+            cmd.args(add_args);
+        }
 
-            // Spawn a new task to run the program
-            cmd.spawn()
-                .expect("Failed to run command")
-                .wait()
-                .expect("Failed to wait for command");
+        self.dbg_print(&format!("Run start command: {:?}", &cmd));
+        cmd.spawn().expect("Failed to run command");
 
-            // Wait for the program based on the wait strategy
-            wait::wait_for_program(dbg, &wait_strategy)
-                .await
-                .expect("Failed to wait for program");
-        });
+        self.dbg_print("Waiting for service to start");
+        self.wait_for_program(&wait_strategy)
+            .await
+            .expect("Failed to wait for program");
 
-        // Add the handler to the hashmap so it can be stopped later.
-        binary_handlers.insert(program.to_owned(), handle);
-
-        // the write lock will be dropped automatically when it goes out of scope.
+        self.dbg_print("Service started");
         Ok(())
     }
 }

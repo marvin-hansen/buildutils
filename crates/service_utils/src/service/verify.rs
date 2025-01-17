@@ -15,7 +15,7 @@ pub(crate) fn verify_binary_exists(
             println!("[VerifyBinary]: Checking if binary exists: {path}");
         }
         if !std::path::Path::new(&path).exists() {
-            return Err(ServiceUtilError::BinaryNotFound(b.to_string()));
+            return Err(ServiceUtilError::BinaryNotFound(path.to_string()));
         }
     }
 

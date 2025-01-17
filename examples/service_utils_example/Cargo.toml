@@ -8,13 +8,19 @@ repository.workspace = true
 authors.workspace = true
 license.workspace = true
 
-[dependencies]
-# Internal crates
+
+[lib]
+path = "src/fakelib.rs"
+
+
+# For testing
+[dev-dependencies]# Internal crates
+service_example = {workspace = true}
 service_utils   = {workspace = true}
 # External crates
-serde = { workspace = true}
+reqwest = { workspace = true }
+serde = {workspace = true}
 tokio = { workspace = true }
-warp = { workspace = true }
 
 [lints]
 workspace = true

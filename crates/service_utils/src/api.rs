@@ -76,26 +76,4 @@ impl ServiceUtil {
     ) -> Result<(), ServiceUtilError> {
         self.start_config(service_start_config).await
     }
-
-    /// Stops a service.
-    ///
-    /// The `program` is the name of the program to stop.
-    ///
-    /// # Errors
-    ///
-    /// Fails if the service fails to stop.
-    ///
-    pub async fn stop_service(&self, program: &str) -> Result<(), ServiceUtilError> {
-        self.stop(program).await
-    }
-
-    /// Stops all services.
-    ///
-    /// # Errors
-    ///
-    /// Fails if any of the services fail to stop.
-    ///
-    pub async fn stop_all_services(&self) -> Result<(), ServiceUtilError> {
-        self.stop_all().await
-    }
 }
