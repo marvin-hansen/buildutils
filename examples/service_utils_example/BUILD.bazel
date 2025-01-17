@@ -1,0 +1,32 @@
+load("@rules_rust//rust:defs.bzl", "rust_doc", "rust_doc_test", "rust_binary")
+
+rust_binary(
+    name = "service_utils_example",
+    srcs = glob([
+        "src/**",
+    ]),
+    crate_root = "src/main.rs",
+    tags = [
+        "service_utils_example",
+        "utils-test",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        # Internal crates
+        "//alias:service_utils",
+    ],
+)
+
+rust_doc(
+    name = "doc",
+    crate = ":service_utils_example",
+    tags = ["doc"],
+    visibility = ["//visibility:public"],
+)
+
+rust_doc_test(
+    name = "doc_test",
+    crate = ":service_utils_example",
+    tags = ["doc-test"],
+    visibility = ["//visibility:public"],
+)

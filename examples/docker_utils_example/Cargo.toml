@@ -1,5 +1,5 @@
 [package]
-name = "docker_util_example"
+name = "docker_utils_example"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true

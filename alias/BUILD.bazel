@@ -11,6 +11,11 @@ alias(
 )
 
 alias(
+    name = "service_utils",
+    actual = "//crates/service_utils",
+)
+
+alias(
     name = "wait_utils",
     actual = "//crates/wait_utils",
 )

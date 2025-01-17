@@ -123,7 +123,7 @@ and handle Docker-related issues in your application.
 
 ## Examples
 
-Check out the [example directory](../../examples/docker_util_example) for complete working examples, including:
+Check out the [example directory](../../examples/docker_utils_example) for complete working examples, including:
 - Postgres container setup and management
 - Container lifecycle management
 - Status monitoring

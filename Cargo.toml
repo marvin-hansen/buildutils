@@ -24,6 +24,23 @@ all = "warn"
 deprecated-safe = "warn"
 deprecated_safe_2024 = "warn"
 
+
+[workspace.dependencies]
+# ==============
+# Internal Aliases
+# ==============
+docker_utils = { path = "crates/docker_utils" }
+service_utils = { path = "crates/service_utils" }
+wait_utils = { path = "crates/wait_utils" }
+# ==============
+# External crates
+# ==============
+bon = {version = "3.3"}
+tokio = { version = "1.42", default-features = false, features = ["macros", "net", "rt-multi-thread", "signal", "time"] }
+tonic = { version = "0.12.1", features = ["transport"] }
+tonic-health = { version = "0.12.3", default-features = false, features = ["transport"] }
+
+
 # Optimize all crates
 [profile.release]
 opt-level = 3
@@ -38,23 +55,3 @@ codegen-units = 1 # Reduce Parallel Code Generation Units to Increase Optimizati
 opt-level = 3
 strip = 'debuginfo'  # Automatically strip debug infos from the binary to reduce size
 codegen-units = 1 # Reduce Parallel Code Generation Units to Increase Optimization
-
-[workspace.dependencies]
-# ==============
-# Internal Aliases
-# ==============
-docker_utils = { path = "crates/docker_utils" }
-service_utils = { path = "crates/service_utils" }
-wait_utils = { path = "crates/wait_utils" }
-
-
-# ==============
-# External crates
-# ==============
-# Macro dependencies
-# https://github.com/elastio/bon
-bon = {version = "3.3"}
-# Regular dependencies
-tokio = { version = "1.42", default-features = false, features = ["macros", "net", "rt-multi-thread", "signal", "time"] }
-tonic = { version = "0.12.1", features = ["transport"] }
-tonic-health = { version = "0.12.3", default-features = false, features = ["transport"] }
