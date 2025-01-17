@@ -10,8 +10,11 @@ members = [
 edition = "2021"
 rust-version = "1.82.0"
 readme = "README.md"
-repository = "https://github.com/marvin-hansen/cgp-exploration"
+repository = "https://github.com/marvin-hansen/buildutils"
+homepage = "https://github.com/marvin-hansen/buildutils"
 authors = ["Marvin Hansen <marvin.hansen@gmail.com>"]
+categories = ["data-utils"]
+
 license = "MIT"
 
 # Linting with clippy
