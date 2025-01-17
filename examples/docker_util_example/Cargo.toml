@@ -1,5 +1,5 @@
 [package]
-name = "docker_utils"
+name = "docker_util_example"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
@@ -8,6 +8,8 @@ repository.workspace = true
 authors.workspace = true
 license.workspace = true
 
+publish = false
+
 
 [lints]
 workspace = true
@@ -15,8 +17,4 @@ workspace = true
 
 [dependencies]
 # Internal crates
-wait_utils = {workspace = true}
-# External crates
-bon = { workspace = true }
-tokio = {workspace = true}
-
+docker_utils = {workspace = true}

@@ -2,9 +2,9 @@
 resolver = "2"
 
 members = [
-    "crates/*"
+    "crates/*",
+    "examples/*"
 ]
-
 
 [workspace.package]
 edition = "2021"
@@ -43,6 +43,8 @@ codegen-units = 1 # Reduce Parallel Code Generation Units to Increase Optimizati
 # ==============
 # Internal Aliases
 # ==============
+docker_utils = { path = "crates/docker_utils" }
+service_utils = { path = "crates/service_utils" }
 wait_utils = { path = "crates/wait_utils" }
 
 
