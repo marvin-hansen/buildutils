@@ -1,6 +1,7 @@
 [package]
 name = "wait_utils"
 version = "0.1.0"
+description = "Utilities for implementing wait loops using varies wait strategies"
 edition.workspace = true
 rust-version.workspace = true
 readme.workspace = true
