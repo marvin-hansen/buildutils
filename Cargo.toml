@@ -13,7 +13,7 @@ readme = "README.md"
 repository = "https://github.com/marvin-hansen/buildutils"
 homepage = "https://github.com/marvin-hansen/buildutils"
 authors = ["Marvin Hansen <marvin.hansen@gmail.com>"]
-categories = ["data-utils"]
+categories = ["development-tools::build-utils"]
 
 license = "MIT"
 
