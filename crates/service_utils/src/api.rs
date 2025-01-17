@@ -1,4 +1,4 @@
-use crate::{EnvVar, ServiceUtil, ServiceUtilError};
+use crate::{ServiceStartConfig, ServiceUtil, ServiceUtilError};
 use wait_utils::WaitStrategy;
 
 impl ServiceUtil {
@@ -6,7 +6,8 @@ impl ServiceUtil {
     ///
     /// The `root_path` is the absolute path to the root directory of the
     /// service binaries. The `binaries` is a vector of names of the binaries
-    /// that should be found in the `root_path`.
+    /// that should be found in the `root_path`. The constructor checks if
+    /// if each binary exists in the `root_path`.
     ///
     /// # Errors
     ///
@@ -23,7 +24,8 @@ impl ServiceUtil {
     ///
     /// The `root_path` is the absolute path to the root directory of the
     /// service binaries. The `binaries` is a vector of names of the binaries
-    /// that should be found in the `root_path`.
+    /// that should be found in the `root_path`. The constructor checks if
+    /// if each binary exists in the `root_path`.
     ///
     /// # Errors
     ///
@@ -51,9 +53,28 @@ impl ServiceUtil {
         &self,
         program: &str,
         wait_strategy: &WaitStrategy,
-        env_var: Option<EnvVar>,
+        env_vars: Option<Vec<String>>,
     ) -> Result<(), ServiceUtilError> {
-        self.start(program, wait_strategy.to_owned(), env_var).await
+        self.start(program, env_vars, wait_strategy.to_owned())
+            .await
+    }
+
+    /// Starts a service with the given configuration.
+    ///
+    /// The `config` is the configuration of the service to start. The
+    /// `wait_strategy` is the wait strategy to use to wait for the service to
+    /// start. The `env_var` is an optional environment variable to set when
+    /// starting the service.
+    ///
+    /// # Errors
+    ///
+    /// Fails if the service fails to start.
+    ///
+    pub async fn start_service_from_config(
+        &self,
+        service_start_config: ServiceStartConfig,
+    ) -> Result<(), ServiceUtilError> {
+        self.start_config(service_start_config).await
     }
 
     /// Stops a service.
@@ -74,7 +95,7 @@ impl ServiceUtil {
     ///
     /// Fails if any of the services fail to stop.
     ///
-    pub async fn stop_all_service(&self) -> Result<(), ServiceUtilError> {
+    pub async fn stop_all_services(&self) -> Result<(), ServiceUtilError> {
         self.stop_all().await
     }
 }
