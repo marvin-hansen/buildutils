@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2](https://github.com/marvin-hansen/buildutils/compare/wait_utils-v0.1.1...wait_utils-v0.1.2) - 2025-01-19
+
+### Other
+
+- Updated README.md across all crates
+- Added project wide copyright
+
 ## [0.1.1](https://github.com/marvin-hansen/buildutils/compare/wait_utils-v0.1.0...wait_utils-v0.1.1) - 2025-01-19
 
 ### Other
