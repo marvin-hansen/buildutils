@@ -32,7 +32,7 @@ deprecated_safe_2024 = "warn"
 # ==============
 # Internal Aliases
 # ==============
-docker_utils = { path = "crates/docker_utils", version = "0.1" }
+docker_utils = { path = "crates/docker_utils", version = "0.2" }
 service_utils = { path = "crates/service_utils", version = "0.1" }
 wait_utils = { path = "crates/wait_utils", version = "0.1" }
 service_example = { path = "examples/service_example" }
