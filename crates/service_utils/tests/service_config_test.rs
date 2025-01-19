@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) "2025" . The buildutils Authors and Contributors. All Rights Reserved.
+ */
+
 use service_utils::{ServiceStartConfig, WaitStrategy};
 
 #[test]

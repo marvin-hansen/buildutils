@@ -2,9 +2,9 @@
 name = "service_utils"
 version = "0.1.0"
 description = "Utilities for service integration testsing"
+readme = "README.md"
 edition.workspace = true
 rust-version.workspace = true
-readme.workspace = true
 repository.workspace = true
 homepage.workspace = true
 categories.workspace = true

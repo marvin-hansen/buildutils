@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) "2025" . The buildutils Authors and Contributors. All Rights Reserved.
+ */
+
 use std::fmt::Display;
 use wait_utils::WaitStrategy;
 // https://github.com/elastio/bon

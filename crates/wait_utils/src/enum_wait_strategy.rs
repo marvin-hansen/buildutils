@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) "2025" . The buildutils Authors and Contributors. All Rights Reserved.
+ */
+
 use std::fmt::{Display, Formatter};
 
 /// Represents the strategy to wait for a container to reach a certain state.

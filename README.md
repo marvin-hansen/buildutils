@@ -1,3 +1,8 @@
+[//]: # (---)
+[//]: # (SPDX-License-Identifier: MIT)
+[//]: # (---)
+
+
 # Build Utils
 
 Utils for CI tests with Bazel. Mostly used on BuildBuddy, but can easily be used locally or on any 
@@ -34,23 +39,12 @@ Demonstrates container lifecycle management using docker_utils:
 - Handle container cleanup
 [View Example](examples/docker_utils_example)
 
-### 🌐 Service Example
-A sample HTTP service implementation that is used to test the service utils crate:
-- Health check endpoint
-- Greeting endpoint
-- Warp web framework integration
-[View Example](examples/service_example)
-
 ### 🔧 Service Utils Example
 Shows how to test service binaries using service_utils:
 - Service binary management
 - Wait strategy implementation
 - Integration test setup
 [View Example](examples/service_utils_example)
-
-## Users
-
-* Docker and Service Utils power thousands of CI test runs each month at Emet-labs.
 
 
 ## Build commands

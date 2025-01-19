@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) "2025" . The buildutils Authors and Contributors. All Rights Reserved.
+ */
+
 use crate::ServiceUtilError;
 
 pub(crate) fn verify_binary_exists(

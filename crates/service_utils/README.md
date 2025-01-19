@@ -1,3 +1,26 @@
+[//]: # (---)
+
+[//]: # (SPDX-License-Identifier: MIT)
+
+[//]: # (---)
+
+[![Crates.io][crates-badge]][crates-url]
+[![Docs.rs][docs-badge]][docs-url]
+[![MIT licensed][mit-badge]][mit-url]
+
+[crates-badge]: https://img.shields.io/badge/Crates.io-Latest-blue
+
+[crates-url]: https://crates.io/crates/service_utils
+
+[docs-badge]: https://img.shields.io/badge/Docs.rs-Latest-blue
+
+[docs-url]: https://docs.rs/service_utils/latest/service_utils/
+
+[mit-badge]: https://img.shields.io/badge/License-MIT-blue.svg
+
+[mit-url]: https://github.com/deepcausality-rs/deep_causality/blob/main/LICENSE
+
+
 # Service Utils 🛠️
 
 A simple utility for testing service binaries with ease and flexibility mainly for usage with BAZEL during CI BUILDS.

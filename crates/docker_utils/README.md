@@ -1,3 +1,25 @@
+[//]: # (---)
+
+[//]: # (SPDX-License-Identifier: MIT)
+
+[//]: # (---)
+
+[![Crates.io][crates-badge]][crates-url]
+[![Docs.rs][docs-badge]][docs-url]
+[![MIT licensed][mit-badge]][mit-url]
+
+[crates-badge]: https://img.shields.io/badge/Crates.io-Latest-blue
+
+[crates-url]: https://crates.io/crates/docker_utils
+
+[docs-badge]: https://img.shields.io/badge/Docs.rs-Latest-blue
+
+[docs-url]: https://docs.rs/docker_utils/latest/docker_utils/
+
+[mit-badge]: https://img.shields.io/badge/License-MIT-blue.svg
+
+[mit-url]: https://github.com/deepcausality-rs/deep_causality/blob/main/LICENSE
+
 # 🐳 Docker Utils
 
 A friendly Rust crate that simplifies Docker container management with a clean and intuitive API.
