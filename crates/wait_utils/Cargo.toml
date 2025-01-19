@@ -2,9 +2,9 @@
 name = "wait_utils"
 version = "0.1.1"
 description = "Utilities for implementing wait loops using varies wait strategies"
+readme = "README.md"
 edition.workspace = true
 rust-version.workspace = true
-readme.workspace = true
 repository.workspace = true
 homepage.workspace = true
 categories.workspace = true

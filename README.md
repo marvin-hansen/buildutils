@@ -5,8 +5,8 @@
 
 # Build Utils
 
-Utils for CI tests with Bazel. Mostly used on BuildBuddy, but can easily be used locally or on any 
-other Bazel CI system. 
+Utils for CI integration tests with Bazel. Mostly used with [Bazel](https://bazel.build/) and on [BuildBuddy](https://www.buildbuddy.io/), 
+but can easily be used locally or on any other Bazel CI system. 
 
 ## Crates
 

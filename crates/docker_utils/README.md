@@ -183,7 +183,7 @@ Contributions are welcome! Feel free to:
 
 ## Licence
 
-This project is licensed under the [MIT license](../../LICENSE).
+This project is licensed under the [MIT license](LICENSE).
 
 ## Author
 * [Marvin Hansen](https://github.com/marvin-hansen)
