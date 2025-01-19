@@ -36,6 +36,15 @@ other situation where you have to work with disposable containers. Docker Utils 
   - Easy builder pattern support.
 
 
+## Install 🚀
+
+Add this to your `Cargo.toml`:
+
+```toml
+[dependencies]
+docker_utils = "0.1.0"
+```
+
 ## Quick Start
 
 ```rust
@@ -116,6 +125,15 @@ use docker_utils::*;
     );
 ```  
 
+## Wait Strategies 🕒
+
+The crate provides several wait strategies through the `wait_utils` dependency:
+
+- `WaitForDuration(u64)`: Wait for a specified number of seconds
+- `WaitUntilConsoleOutputContains(String, u64)`: Wait for a specified console output or until a timeout occurs.
+- `WaitForHttpHealthCheck(String, u64)`: Wait until an HTTP request to the given URL or until a timeout occurs.
+- `WaitForGrpcHealthCheck(u16, u64)`: Wait until an gRPC health request to the given URL or until a timeout occurs.
+
 ## Error Handling
 
 The crate uses a custom `DockerError` type for comprehensive error handling, making it easy to identify 
@@ -142,6 +160,7 @@ Contributions are welcome! Feel free to:
 - Improve documentation
 
 ## Licence
+
 This project is licensed under the [MIT license](../../LICENSE).
 
 ## Author

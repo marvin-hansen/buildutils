@@ -1,6 +1,6 @@
 # Service Example 🌐
 
-A sample HTTP service implementation that demonstrates a typical service that might be tested using the `service_utils` crate.
+A sample HTTP service implementation that demonstrates a typical service to be tested using the `service_utils` crate.
 
 ## Features
 
@@ -15,7 +15,7 @@ A sample HTTP service implementation that demonstrates a typical service that mi
 
 1. Start the service:
    ```bash
-   cargo run
+   cargo run -p service_example
    ```
 2. Test the endpoints:
    ```bash
@@ -24,6 +24,6 @@ A sample HTTP service implementation that demonstrates a typical service that mi
    ```
 
 ## Dependencies
-
-- warp = "0.3"
-- tokio = { version = "1", features = ["full"] }
+- serde 
+- warp 
+- tokio
