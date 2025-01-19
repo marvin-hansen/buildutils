@@ -17,6 +17,10 @@ pub(crate) fn verify_binary_exists(
         if !std::path::Path::new(&path).exists() {
             return Err(ServiceUtilError::BinaryNotFound(path.to_string()));
         }
+
+        if dbg {
+            println!("[VerifyBinary]: OK binary exists: {b}");
+        }
     }
 
     Ok(())

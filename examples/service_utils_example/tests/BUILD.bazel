@@ -11,6 +11,7 @@ rust_test_suite(
     ],
     tags = [
         "integration-test",
+        "service_utils_example",
     ],
     visibility = ["//visibility:public"],
     deps = [

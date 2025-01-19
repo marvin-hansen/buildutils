@@ -81,7 +81,8 @@ async fn test_container_exists(docker_util: &DockerUtil, container_id: &str) {
 async fn test_stop_container(docker_util: &DockerUtil, container_id: &str) {
     println!("test_stop_container");
 
-    let res = docker_util.stop_container(container_id);
+    let delete_container = true;
+    let res = docker_util.stop_container(container_id, delete_container);
     assert!(res.is_ok());
 
     let res = docker_util.check_if_container_is_running(container_id);

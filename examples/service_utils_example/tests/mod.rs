@@ -1,1 +1,1 @@
-mod service_tests;
+mod service_utils_tests;

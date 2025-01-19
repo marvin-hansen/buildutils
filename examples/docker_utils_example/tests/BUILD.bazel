@@ -1,0 +1,19 @@
+load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
+load("@rules_rust//rust:defs.bzl", "rust_test_suite")
+
+rust_test_suite(
+    name = "tests",
+    srcs = glob([
+        "*_tests.rs",
+    ]),
+    tags = [
+        "docker_utils_example",
+        "integration-test",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        # Crate under test
+        "//alias:docker_utils",
+        # External crates
+    ],
+)

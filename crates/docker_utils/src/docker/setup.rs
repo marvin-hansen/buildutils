@@ -71,7 +71,7 @@ impl DockerUtil {
                 self.dbg_print(&format!("Container uses DIFFERENT tag : {container_name}"));
                 self.dbg_print(&format!("STOP running Container : {container_name}"));
 
-                self.stop_container(container_name).unwrap_or_else(|_| {
+                self.stop_container(container_name, true).unwrap_or_else(|_| {
                     panic!(
                         "[TestEnv/CI:setup_container]: Failed to check stop container {container_name} "
                     )

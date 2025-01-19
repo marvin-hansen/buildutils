@@ -1,6 +1,6 @@
 # Docker Utils Example 🐳
 
-This example demonstrates how to use the `docker_utils` crate to manage Docker containers in your Rust applications.
+This example demonstrates how to use the `docker_utils` crate to manage Docker containers in your Rust integration tests.
 
 ## Features
 
@@ -9,43 +9,28 @@ This example demonstrates how to use the `docker_utils` crate to manage Docker c
 - Error handling and status verification
 - Container port mapping
 
-## Example Code
-
-```rust
-use docker_utils::*;
-
-fn main() -> Result<(), Error> {
-    // Initialize Docker utilities
-    let docker_util = DockerUtil::new()?;
-    
-    // Configure and start a Postgres container
-    let container_config = postgres_db_container_config();
-    let (container_id, port) = docker_util.get_or_start_container(&container_config)?;
-    
-    // Verify container is running
-    assert!(docker_util.check_if_container_is_running(&container_id)?);
-    
-    // Stop and clean up
-    docker_util.stop_container(&container_id)?;
-    Ok(())
-}
-```
 
 ## Running the Example
 
-1. Make sure Docker is installed and running on your system
-2. Run the example:
-   ```bash
-   cargo run
-   ```
+
+Make sure Docker is installed and running on your system 
+ 
+Run the example with Cargo:
+```bash
+cargo test -p docker_utils_example
+```
+
+Run the example with Bazel:
+```bash
+bazel  test //... --test_tag_filters=docker_utils_example
+```
 
 The example will:
 1. Start a Postgres container
 2. Verify it's running
 3. Stop the container
-4. Verify it's been cleaned up
+4. Verify the container has been stopped and deleted
 
 ## Dependencies
 
 - docker_utils = "0.1.0"
-- Postgres Docker image

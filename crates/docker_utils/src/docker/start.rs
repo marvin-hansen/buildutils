@@ -52,7 +52,7 @@ impl DockerUtil {
             }
 
             self.dbg_print("Stopping running container b/c no re-use wanted.");
-            self.stop_container(container_id)
+            self.stop_container(container_id, true)
                 .expect("Failed to stop container");
         } else {
             self.dbg_print("Container is NOT running.");

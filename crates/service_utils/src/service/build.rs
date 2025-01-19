@@ -12,6 +12,9 @@ impl ServiceUtil {
         }
 
         verify_binary_exists(dbg, root_path, &binaries)?;
+        if dbg {
+            println!("[ServiceUtil]: OK! All binaries exists in path: {root_path}");
+        }
 
         Ok(ServiceUtil {
             dbg,

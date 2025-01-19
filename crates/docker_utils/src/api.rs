@@ -72,7 +72,7 @@ impl DockerUtil {
     ///
     /// fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let docker = DockerUtil::new()?;
-    ///     
+    ///
     ///     let config = ContainerConfig::new(
     ///         "postgres",
     ///         "postgres",
@@ -89,7 +89,7 @@ impl DockerUtil {
     ///             15,
     ///         ),
     ///     );
-    ///     
+    ///
     ///     let (container_name, port) = docker.setup_container(&config)?;
     ///     println!("Container {} running on port {}", container_name, port);
     ///     Ok(())
@@ -130,7 +130,6 @@ impl DockerUtil {
         // see src/docker/setup.rs
         self.setup(container_config)
     }
-
     /// Gets an existing container or starts a new one with the specified configuration
     ///
     /// # Arguments
@@ -150,7 +149,7 @@ impl DockerUtil {
     ///
     /// fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let docker = DockerUtil::new()?;
-    ///     
+    ///
     ///     let config = ContainerConfig::new(
     ///         "redis",
     ///         "redis",
@@ -164,7 +163,7 @@ impl DockerUtil {
     ///         false,
     ///         WaitStrategy::default(),
     ///     );
-    ///     
+    ///
     ///     let (container_name, port) = docker.get_or_start_container(&config)?;
     ///     println!("Redis container {} available on port {}", container_name, port);
     ///     Ok(())
@@ -178,7 +177,6 @@ impl DockerUtil {
         // see src/docker/start.rs
         self.get_or_start(container_config)
     }
-
     /// Check if a container exists by its ID.
     ///
     /// # Arguments
@@ -196,7 +194,7 @@ impl DockerUtil {
     ///
     /// fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let docker = DockerUtil::new()?;
-    ///     
+    ///
     ///     let container_id = "redis-6379";  // Example container ID
     ///     match docker.check_if_container_is_running(container_id)? {
     ///         true => println!("Container {} is running", container_id),
@@ -210,12 +208,12 @@ impl DockerUtil {
         // see src/docker/check_running.rs
         self.check_running(container_id)
     }
-
     /// Stop a container
     ///
     /// # Arguments
     ///
     /// * `container_id` - The ID of the container to stop.
+    /// * `delete` - Whether to delete the container after stopping.
     ///
     /// # Returns
     ///
@@ -228,19 +226,19 @@ impl DockerUtil {
     ///
     /// fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let docker = DockerUtil::new()?;
-    ///     
+    ///
     ///     let container_id = "redis-6379";  // Example container ID
-    ///     docker.stop_container(container_id)?;
+    ///     let delete_container = false;
+    ///     docker.stop_container(container_id, delete_container)?;
     ///     println!("Container {} stopped successfully", container_id);
     ///     Ok(())
     /// }
     /// ```
     ///
-    pub fn stop_container(&self, container_id: &str) -> Result<(), DockerError> {
+    pub fn stop_container(&self, container_id: &str, delete: bool) -> Result<(), DockerError> {
         // see src/docker/stop.rs
-        self.stop(container_id)
+        self.stop(container_id, delete)
     }
-
     /// Pulls a container image from a registry.
     ///
     /// This method pulls a container image from a specified registry using the `docker pull` command.
@@ -262,21 +260,21 @@ impl DockerUtil {
     ///
     /// fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let docker = DockerUtil::new()?;
-    ///     
+    ///
     ///     // Pull image for specific platform
     ///     docker.pull_container_image(
     ///         "nginx-container",
     ///         "nginx:latest",
     ///         Some("linux/amd64")
     ///     )?;
-    ///     
+    ///
     ///     // Pull image without platform specification
     ///     docker.pull_container_image(
     ///         "redis-container",
     ///         "redis:latest",
     ///         None
     ///     )?;
-    ///     
+    ///
     ///     Ok(())
     /// }
     /// ```
@@ -294,7 +292,6 @@ impl DockerUtil {
         // see src/docker/pull.rs
         self.pull(container_id, image, platform)
     }
-
     /// Prunes all stopped containers and their associated volumes and networks.
     ///
     /// This method executes the `docker system prune` command with the `--all` and `--force` options to remove all stopped containers, their associated volumes, and networks.
@@ -310,7 +307,7 @@ impl DockerUtil {
     ///
     /// fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let mut docker = DockerUtil::new()?;
-    ///     
+    ///
     ///     // Clean up all stopped containers and their resources
     ///     docker.prune_all_containers()?;
     ///     println!("Successfully pruned all stopped containers");
