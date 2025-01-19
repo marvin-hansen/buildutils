@@ -30,7 +30,8 @@ async fn test_service() {
     println!("Test service");
     let url = format!("{BASE_URL}hello");
 
-    let resp = reqwest::get(url).await
+    let resp = reqwest::get(url)
+        .await
         .expect("Failed to send request")
         .json::<GreetResponse>()
         .await;
@@ -42,7 +43,6 @@ async fn test_service() {
     println!("{resp:#?}");
     assert_eq!(resp.message, "Hello world!");
 }
-
 
 fn get_service_wait_strategy(port: u16) -> WaitStrategy {
     let url = format!("http://localhost:{port}/health");

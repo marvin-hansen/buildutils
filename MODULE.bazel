@@ -1,4 +1,4 @@
-module(name = "cgp-exploration")
+module(name = "buildutils")
 
 ###############################################################################
 # Bazel Dependencies https://registry.bazel.build/

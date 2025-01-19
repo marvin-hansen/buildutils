@@ -1,7 +1,6 @@
 use crate::service::verify::verify_binary_exists;
 use crate::{ServiceUtil, ServiceUtilError};
 
-
 impl ServiceUtil {
     pub(crate) async fn build(
         dbg: bool,
