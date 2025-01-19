@@ -1,0 +1,4 @@
+[[package]] # the double square brackets define a TOML table array
+name = "buildutils" # name of the package to configure
+changelog_include = ["crates/docker_utils", "crates/service_utils", "crates/wait_utils"] # include commits from these crates in the changelog
+changelog_path = "./CHANGELOG.md" # set the path of the changelog to the root of the repository
