@@ -1,6 +1,6 @@
 [package]
 name = "docker_utils"
-version = "0.2.2"
+version = "0.2.3"
 description = "Utilities for integration testsing with Docker"
 readme = "README.md"
 edition.workspace = true
