@@ -85,7 +85,7 @@ rust_library(
         "//thirdparty/crates/futures-sink-0.3.31:futures_sink",
         "//thirdparty/crates/futures-util-0.3.31:futures_util",
         "//thirdparty/crates/http-0.2.12:http",
-        "//thirdparty/crates/indexmap-2.7.0:indexmap",
+        "//thirdparty/crates/indexmap-2.7.1:indexmap",
         "//thirdparty/crates/slab-0.4.9:slab",
         "//thirdparty/crates/tokio-1.43.0:tokio",
         "//thirdparty/crates/tokio-util-0.7.13:tokio_util",

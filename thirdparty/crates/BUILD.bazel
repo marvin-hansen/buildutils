@@ -32,7 +32,7 @@ filegroup(
 # Workspace Member Dependencies
 alias(
     name = "bon",
-    actual = "//thirdparty/crates/bon-3.3.2:bon",
+    actual = "//thirdparty/crates/bon-2.3.0:bon",
     tags = ["manual"],
 )
 

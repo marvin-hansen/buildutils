@@ -39,7 +39,7 @@ service_example = { path = "examples/service_example" }
 # ==============
 # External crates
 # ==============
-bon = {version = "3.3"}
+bon = {version = "2.3", default-features = false}
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json", "gzip"] }
 serde = { version = "1.0",features = ["derive"]}
 tokio = { version = "1", default-features = false, features = ["macros", "net", "rt-multi-thread", "signal", "time"] }

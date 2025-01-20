@@ -293,7 +293,7 @@ def aliases(
 _NORMAL_DEPENDENCIES = {
     "": {
         _COMMON_CONDITION: {
-            "bon": Label("//thirdparty/crates/bon-3.3.2:bon"),
+            "bon": Label("//thirdparty/crates/bon-2.3.0:bon"),
             "reqwest": Label("//thirdparty/crates/reqwest-0.12.12:reqwest"),
             "serde": Label("//thirdparty/crates/serde-1.0.217:serde"),
             "tokio": Label("//thirdparty/crates/tokio-1.43.0:tokio"),

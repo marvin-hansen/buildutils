@@ -8,7 +8,7 @@ crates_vendor(
         # Macro dependencies
         "bon": crate.spec(
             package = "bon",
-            version = "3.3",
+            version = "2.3",
         ),
         # Regular dependencies
         "serde": crate.spec(

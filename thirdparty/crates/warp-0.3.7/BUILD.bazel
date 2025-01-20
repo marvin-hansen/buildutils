@@ -100,7 +100,7 @@ rust_library(
         "//thirdparty/crates/pin-project-1.1.8:pin_project",
         "//thirdparty/crates/scoped-tls-1.0.1:scoped_tls",
         "//thirdparty/crates/serde-1.0.217:serde",
-        "//thirdparty/crates/serde_json-1.0.135:serde_json",
+        "//thirdparty/crates/serde_json-1.0.137:serde_json",
         "//thirdparty/crates/serde_urlencoded-0.7.1:serde_urlencoded",
         "//thirdparty/crates/tokio-1.43.0:tokio",
         "//thirdparty/crates/tokio-tungstenite-0.21.0:tokio_tungstenite",
