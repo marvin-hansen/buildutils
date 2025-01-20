@@ -10,6 +10,8 @@ homepage.workspace = true
 categories.workspace = true
 authors.workspace = true
 license.workspace = true
+# Exclude all bazel files as these conflict with Bazel workspace when vencored.
+exclude = ["*.bazel", "*/*.bazel",  "*.bazel.*", "BUILD", "BUILD.bazel", "MODULE.bazel", ".bazelignore",".bazelrc", "tests/**/*"]
 
 
 [lints]
