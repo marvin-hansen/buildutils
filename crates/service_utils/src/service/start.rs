@@ -51,7 +51,6 @@ impl ServiceUtil {
 
         self.dbg_print("Constructing start command");
         let mut cmd = Command::new(bin);
-        cmd.arg("&");
 
         if env_vars.is_some() {
             self.dbg_print("Setting environment variables");
