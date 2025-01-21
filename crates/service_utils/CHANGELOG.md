@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5](https://github.com/marvin-hansen/buildutils/compare/service_utils-v0.1.4...service_utils-v0.1.5) - 2025-01-21
+
+### Other
+
+- Removed unnecessary start option that conflicts with args from the binary to start.
+
 ## [0.1.4](https://github.com/marvin-hansen/buildutils/compare/service_utils-v0.1.3...service_utils-v0.1.4) - 2025-01-20
 
 ### Other
