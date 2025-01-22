@@ -34,8 +34,9 @@ use wait_utils::WaitStrategy;
 ///
 /// let config = ServiceStartConfig::builder()
 ///     .program("program")
+///     .program_args(vec!["arg1", "arg2"])
 ///     .wait_strategy(WaitStrategy::NoWait)
-///     .env_vars(vec![("key".into(), "value".into())])
+///     .env_vars(vec![("KEY".into(), "VALUE".into())])
 ///     .build();
 /// ```
 ///
@@ -47,6 +48,7 @@ use wait_utils::WaitStrategy;
 pub struct ServiceStartConfig {
     program: &'static str,
     wait_strategy: WaitStrategy,
+    program_args: Option<Vec< &'static str,>>,
     env_vars: Option<Vec<(String, String)>>,
 }
 
@@ -65,14 +67,7 @@ impl ServiceStartConfig {
     /// ```rust
     /// use service_utils::*;
     ///
-    /// let config = ServiceStartConfig::new("program", WaitStrategy::NoWait, None);
-    /// ```
-    /// Configuration with optional environment variables using the constructor:
-    ///
-    /// ```rust
-    /// use service_utils::*;
-    ///
-    /// let config = ServiceStartConfig::new("program", WaitStrategy::NoWait, Some(vec![("key".into(), "value".into())]));
+    /// let config = ServiceStartConfig::new("program", WaitStrategy::NoWait, None, None);
     /// ```
     ///
     /// # Returns
@@ -82,11 +77,13 @@ impl ServiceStartConfig {
     pub fn new(
         program: &'static str,
         wait_strategy: WaitStrategy,
+        program_args: Option<Vec< &'static str,>>,
         env_vars: Option<Vec<(String, String)>>,
     ) -> Self {
         Self {
             program,
             wait_strategy,
+            program_args,
             env_vars,
         }
     }
@@ -98,6 +95,8 @@ impl ServiceStartConfig {
         self.program
     }
 
+
+
     #[inline]
     pub const fn wait_strategy(&self) -> &WaitStrategy {
         &self.wait_strategy
@@ -107,6 +106,10 @@ impl ServiceStartConfig {
     pub const fn env_vars(&self) -> &Option<Vec<(String, String)>>
     {
         &self.env_vars
+    }
+    #[inline]
+    pub fn program_args(&self) -> &Option<Vec<&'static str>> {
+        &self.program_args
     }
 }
 

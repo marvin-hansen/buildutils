@@ -57,10 +57,11 @@ impl ServiceUtil {
     pub async fn start_service(
         &self,
         program: &str,
+        program_args: Option<Vec<&str>>,
         wait_strategy: &WaitStrategy,
         env_vars: Option<Vec<(String, String)>>,
     ) -> Result<(), ServiceUtilError> {
-        self.start(program, env_vars, wait_strategy.to_owned())
+        self.start(program, program_args, env_vars, wait_strategy.to_owned())
             .await
     }
 

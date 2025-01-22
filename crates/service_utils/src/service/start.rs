@@ -14,16 +14,18 @@ impl ServiceUtil {
     ) -> Result<(), ServiceUtilError> {
         // Extract parameters
         let program = service_start_config.program();
+        let program_args = service_start_config.program_args().to_owned();
         let wait_strategy = service_start_config.wait_strategy().to_owned();
         let env_vars = service_start_config.env_vars().to_owned();
 
         // Start the service
-        self.start(program, env_vars, wait_strategy).await
+        self.start(program,program_args, env_vars, wait_strategy).await
     }
 
     pub(crate) async fn start(
         &self,
         program: &str,
+        program_args: Option<Vec< & str,>>,
         env_vars: Option<Vec<(String, String)>>,
         wait_strategy: WaitStrategy,
     ) -> Result<(), ServiceUtilError> {
@@ -58,6 +60,14 @@ impl ServiceUtil {
 
             // Add environment variables
             cmd.envs(env_vars);
+        }
+
+        if program_args.is_some() {
+            self.dbg_print("Setting program arguments");
+            let program_args = program_args.unwrap();
+
+            // Add program arguments
+            cmd.args(program_args);
         }
 
         self.dbg_print(&format!("Run start command: {:?}", &cmd));
