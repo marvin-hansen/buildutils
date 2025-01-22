@@ -54,11 +54,10 @@ impl ServiceUtil {
 
         if env_vars.is_some() {
             self.dbg_print("Setting environment variables");
-            let add_args = env_vars.unwrap();
+            let env_vars = env_vars.unwrap();
 
-            // Add env variables
-            cmd.arg("-e");
-            cmd.args(add_args);
+            // Add environment variables
+            cmd.envs(env_vars);
         }
 
         self.dbg_print(&format!("Run start command: {:?}", &cmd));
