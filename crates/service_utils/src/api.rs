@@ -58,7 +58,7 @@ impl ServiceUtil {
         &self,
         program: &str,
         wait_strategy: &WaitStrategy,
-        env_vars: Option<Vec<String>>,
+        env_vars: Option<Vec<(String, String)>>,
     ) -> Result<(), ServiceUtilError> {
         self.start(program, env_vars, wait_strategy.to_owned())
             .await

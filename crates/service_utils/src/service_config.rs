@@ -35,7 +35,7 @@ use wait_utils::WaitStrategy;
 /// let config = ServiceStartConfig::builder()
 ///     .program("program")
 ///     .wait_strategy(WaitStrategy::NoWait)
-///     .env_vars(vec!["var1=value1".into(), "var2=value2".into()])
+///     .env_vars(vec![("key".into(), "value".into())])
 ///     .build();
 /// ```
 ///
@@ -47,7 +47,7 @@ use wait_utils::WaitStrategy;
 pub struct ServiceStartConfig {
     program: &'static str,
     wait_strategy: WaitStrategy,
-    env_vars: Option<Vec<String>>,
+    env_vars: Option<Vec<(String, String)>>,
 }
 
 impl ServiceStartConfig {
@@ -72,7 +72,7 @@ impl ServiceStartConfig {
     /// ```rust
     /// use service_utils::*;
     ///
-    /// let config = ServiceStartConfig::new("program", WaitStrategy::NoWait, Some(vec!["var1=value1".into(), "var2=value2".into()]));
+    /// let config = ServiceStartConfig::new("program", WaitStrategy::NoWait, Some(vec![("key".into(), "value".into())]));
     /// ```
     ///
     /// # Returns
@@ -82,7 +82,7 @@ impl ServiceStartConfig {
     pub fn new(
         program: &'static str,
         wait_strategy: WaitStrategy,
-        env_vars: Option<Vec<String>>,
+        env_vars: Option<Vec<(String, String)>>,
     ) -> Self {
         Self {
             program,
@@ -104,7 +104,8 @@ impl ServiceStartConfig {
     }
 
     #[inline]
-    pub const fn env_vars(&self) -> &Option<Vec<String>> {
+    pub const fn env_vars(&self) -> &Option<Vec<(String, String)>>
+    {
         &self.env_vars
     }
 }

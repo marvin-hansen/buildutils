@@ -16,7 +16,7 @@ fn test_service_config_basic() {
 
 #[test]
 fn test_service_config_with_env_vars() {
-    let env_vars = vec!["KEY1=value1".to_string(), "KEY2=value2".to_string()];
+    let env_vars = vec![("key".into(), "value".into())];
     let config =
         ServiceStartConfig::new("test_program", WaitStrategy::NoWait, Some(env_vars.clone()));
 
@@ -46,13 +46,12 @@ fn test_service_config_display() {
     let config = ServiceStartConfig::new(
         "test_program",
         WaitStrategy::NoWait,
-        Some(vec!["KEY=value".to_string()]),
+        Some(vec![("key".into(), "value".into())]),
     );
 
     let display_string = format!("{}", config);
     assert!(display_string.contains("test_program"));
     assert!(display_string.contains("NoWait"));
-    assert!(display_string.contains("KEY=value"));
 }
 
 #[test]

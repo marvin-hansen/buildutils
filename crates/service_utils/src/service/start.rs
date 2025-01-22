@@ -24,7 +24,7 @@ impl ServiceUtil {
     pub(crate) async fn start(
         &self,
         program: &str,
-        env_vars: Option<Vec<String>>,
+        env_vars: Option<Vec<(String, String)>>,
         wait_strategy: WaitStrategy,
     ) -> Result<(), ServiceUtilError> {
         // Check if the program is in the binaries vector
