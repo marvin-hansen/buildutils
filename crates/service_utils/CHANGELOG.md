@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0](https://github.com/marvin-hansen/buildutils/compare/service_utils-v0.1.6...service_utils-v0.2.0) - 2025-01-22
+
+### Other
+
+- Added handling of additional start parameters to ServiceUtil
+
 ## [0.1.6](https://github.com/marvin-hansen/buildutils/compare/service_utils-v0.1.5...service_utils-v0.1.6) - 2025-01-22
 
 ### Other
