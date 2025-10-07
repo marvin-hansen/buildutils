@@ -8,7 +8,7 @@ crates_vendor(
         # Macro dependencies
         "bon": crate.spec(
             package = "bon",
-            version = "2.3",
+            version = "3.8",
         ),
         # Regular dependencies
         "serde": crate.spec(
@@ -36,22 +36,23 @@ crates_vendor(
                 "time",
             ],
             package = "tokio",
-            version = "1.42",
+            version = "1.47",
         ),
         "tonic": crate.spec(
             features = ["transport"],
             package = "tonic",
-            version = "0.12",
+            version = "0.14",
         ),
         "tonic-health": crate.spec(
             default_features = False,
-            features = ["transport"],
             package = "tonic-health",
-            version = "0.12",
+            version = "0.14",
         ),
         "warp": crate.spec(
             package = "warp",
-            version = "0.3",
+            default_features = False,
+            features = ["server"],
+            version = "0.4",
         ),
     },
     repository_name = "queng_vendored",

@@ -3,9 +3,9 @@ module(name = "buildutils")
 ###############################################################################
 # Bazel Dependencies https://registry.bazel.build/
 ###############################################################################
-bazel_dep(name = "aspect_bazel_lib", version = "2.10.0")
-bazel_dep(name = "platforms", version = "0.0.10")
-bazel_dep(name = "rules_rust", version = "0.56.0")
+bazel_dep(name = "aspect_bazel_lib", version = "2.16.0")
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "rules_rust", version = "0.65.0")
 
 # Toolchains
 bazel_dep(name = "toolchains_musl", version = "0.1.20", dev_dependency = True)
@@ -13,9 +13,9 @@ bazel_dep(name = "toolchains_musl", version = "0.1.20", dev_dependency = True)
 ###############################################################################
 # Rust toolchain https://github.com/bazelbuild/rules_rust/releases
 ###############################################################################
-RUST_EDITION = "2021"  # NOTE: 2024 will be released with Rust 1.85.0
+RUST_EDITION = "2024"
 
-RUST_VERSION = "1.84.0"
+RUST_VERSION = "1.90.0"
 
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
 rust.toolchain(

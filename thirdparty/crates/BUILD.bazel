@@ -31,43 +31,85 @@ filegroup(
 
 # Workspace Member Dependencies
 alias(
+    name = "bon-3.8.0",
+    actual = "//thirdparty/crates/bon-3.8.0:bon",
+    tags = ["manual"],
+)
+
+alias(
     name = "bon",
-    actual = "//thirdparty/crates/bon-2.3.0:bon",
+    actual = "//thirdparty/crates/bon-3.8.0:bon",
+    tags = ["manual"],
+)
+
+alias(
+    name = "reqwest-0.12.23",
+    actual = "//thirdparty/crates/reqwest-0.12.23:reqwest",
     tags = ["manual"],
 )
 
 alias(
     name = "reqwest",
-    actual = "//thirdparty/crates/reqwest-0.12.12:reqwest",
+    actual = "//thirdparty/crates/reqwest-0.12.23:reqwest",
+    tags = ["manual"],
+)
+
+alias(
+    name = "serde-1.0.228",
+    actual = "//thirdparty/crates/serde-1.0.228:serde",
     tags = ["manual"],
 )
 
 alias(
     name = "serde",
-    actual = "//thirdparty/crates/serde-1.0.217:serde",
+    actual = "//thirdparty/crates/serde-1.0.228:serde",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tokio-1.47.1",
+    actual = "//thirdparty/crates/tokio-1.47.1:tokio",
     tags = ["manual"],
 )
 
 alias(
     name = "tokio",
-    actual = "//thirdparty/crates/tokio-1.43.0:tokio",
+    actual = "//thirdparty/crates/tokio-1.47.1:tokio",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tonic-0.14.2",
+    actual = "//thirdparty/crates/tonic-0.14.2:tonic",
     tags = ["manual"],
 )
 
 alias(
     name = "tonic",
-    actual = "//thirdparty/crates/tonic-0.12.3:tonic",
+    actual = "//thirdparty/crates/tonic-0.14.2:tonic",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tonic-health-0.14.2",
+    actual = "//thirdparty/crates/tonic-health-0.14.2:tonic_health",
     tags = ["manual"],
 )
 
 alias(
     name = "tonic-health",
-    actual = "//thirdparty/crates/tonic-health-0.12.3:tonic_health",
+    actual = "//thirdparty/crates/tonic-health-0.14.2:tonic_health",
+    tags = ["manual"],
+)
+
+alias(
+    name = "warp-0.4.2",
+    actual = "//thirdparty/crates/warp-0.4.2:warp",
     tags = ["manual"],
 )
 
 alias(
     name = "warp",
-    actual = "//thirdparty/crates/warp-0.3.7:warp",
+    actual = "//thirdparty/crates/warp-0.4.2:warp",
     tags = ["manual"],
 )
