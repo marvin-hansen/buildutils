@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2](https://github.com/marvin-hansen/buildutils/compare/service_utils-v0.2.1...service_utils-v0.2.2) - 2026-07-28
+
+### Other
+
+- Merge remote-tracking branch 'origin/main'
+- Fixed more lints and clippies
+- Code formatting, fixes, and linting
+
 ## [0.2.1](https://github.com/marvin-hansen/buildutils/compare/service_utils-v0.2.0...service_utils-v0.2.1) - 2025-10-07
 
 ### Other
