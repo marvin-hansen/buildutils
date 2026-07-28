@@ -8,7 +8,7 @@ crates_vendor(
         # Macro dependencies
         "bon": crate.spec(
             package = "bon",
-            version = "3.8",
+            version = "3.9",
         ),
         # Regular dependencies
         "serde": crate.spec(
@@ -19,12 +19,12 @@ crates_vendor(
         "reqwest": crate.spec(
             default_features = False,
             features = [
-                "rustls-tls",
+                "rustls",
                 "json",
                 "gzip",
             ],
             package = "reqwest",
-            version = "0.12",
+            version = "0.13",
         ),
         "tokio": crate.spec(
             default_features = False,
@@ -49,9 +49,9 @@ crates_vendor(
             version = "0.14",
         ),
         "warp": crate.spec(
-            package = "warp",
             default_features = False,
             features = ["server"],
+            package = "warp",
             version = "0.4",
         ),
     },
