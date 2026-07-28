@@ -29,7 +29,7 @@ impl DockerUtil {
         // Example docker logs apiproxy-7777
         match Command::new("docker")
             .arg("logs")
-            .arg(format!(" {container_id}"))
+            .arg(container_id)
             .output()
         {
             Ok(out) => {
@@ -55,6 +55,46 @@ impl DockerUtil {
         }
     }
 
+    /// Check whether a container with exactly this ID is running.
+    ///
+    /// Unlike [`DockerUtil::get_running_container`] this does not require the ID to carry a
+    /// port suffix, so it is safe to call for arbitrary container names.
+    ///
+    /// # Arguments
+    ///
+    /// * `container_id` - The ID of the container to check.
+    ///
+    /// # Returns
+    ///
+    /// Returns whether the container is running, or a `DockerError` if `docker ps` failed.
+    ///
+    pub(crate) fn is_container_running(&self, container_id: &str) -> Result<bool, DockerError> {
+        let mut cmd = Command::new("docker");
+        cmd.arg("ps");
+        cmd.arg("--filter=status=running");
+        cmd.arg(exact_name_filter(container_id));
+        cmd.arg("--format={{.Names}}");
+
+        self.dbg_print(&format!(
+            "[is_container_running]: Run Docker command: {cmd:?}"
+        ));
+
+        match cmd.output() {
+            Ok(out) if out.status.success() => {
+                let names = String::from_utf8_lossy(&out.stdout);
+                Ok(!names.trim().is_empty())
+            }
+            Ok(out) => Err(DockerError::from(format!(
+                "[is_container_running]: docker ps failed for {container_id} (exit {:?}): {}",
+                out.status.code(),
+                String::from_utf8_lossy(&out.stderr).trim(),
+            ))),
+            Err(e) => Err(DockerError::from(format!(
+                "[is_container_running]: Error getting container {container_id}: {e}"
+            ))),
+        }
+    }
+
     /// Get the the name and of about a running container by its ID.
     ///
     /// # Arguments
@@ -64,6 +104,7 @@ impl DockerUtil {
     /// # Returns
     ///
     /// Either returns the name and port of a container if its running, otherwise an `DockerError`.
+    /// The container ID must be of the form `<name>-<port>`, because the port is read from it.
     ///
     pub(crate) fn get_running_container(
         &self,
@@ -73,43 +114,13 @@ impl DockerUtil {
             "[get_running_container]: Check container image for: {container_id}."
         ));
 
-        let mut cmd = Command::new("docker");
-        cmd.arg("ps");
-        cmd.arg("--filter=status=running");
-        cmd.arg(format!("--filter=name={container_id}"));
-        cmd.arg("--format={{.Names}}");
-
-        self.dbg_print(&format!(
-            "[get_running_container]: Run Docker command: {cmd:?}"
-        ));
-
-        let container = match cmd.output() {
-            Ok(out) => String::from_utf8_lossy(&out.stdout).to_string(),
-            Err(e) => {
-                return Err(DockerError::from(format!(
-                    "[get_running_container]: Error getting container {container_id}: {e}"
-                )));
-            }
-        };
-
-        self.dbg_print(&format!(
-            "[get_running_container]: Empty output: {}.",
-            container.is_empty()
-        ));
-
-        if container.is_empty() {
+        if !self.is_container_running(container_id)? {
             return Err(DockerError::from(format!(
                 "[get_running_container]: Error no container found for ID: {container_id}",
             )));
         }
 
-        let parts = container_id.split('-').collect::<Vec<&str>>();
-        let port = parts
-            .last()
-            .expect("[get_running_container]: Failed to get container port")
-            .trim()
-            .parse::<u16>()
-            .expect("[get_running_container]: Failed to convert container port from string to u16");
+        let port = container_port_from_id(container_id)?;
 
         Ok((container_id.to_string(), port))
     }
@@ -171,23 +182,30 @@ impl DockerUtil {
         &self,
         container_id: &str,
     ) -> Result<String, DockerError> {
-        match self.check_if_container_is_running(container_id) {
-            Ok(_) => {}
-            Err(_) => {
-                return Err(DockerError::from(format!(
-                    "[get_running_container_image_tag]: Error no container found for ID: {container_id}",
-                )));
-            }
+        if !self.is_container_running(container_id)? {
+            return Err(DockerError::from(format!(
+                "[get_running_container_image_tag]: Error no container found for ID: {container_id}",
+            )));
         }
 
-        self.dbg_print("");
-        let container_image = match Command::new("docker")
-            .arg("ps")
-            .arg(format!("--filter=name={container_id}"))
-            .arg("--format={{.Image}}")
-            .output()
-        {
-            Ok(out) => String::from_utf8_lossy(&out.stdout).to_string(),
+        let mut cmd = Command::new("docker");
+        cmd.arg("ps");
+        cmd.arg(exact_name_filter(container_id));
+        cmd.arg("--format={{.Image}}");
+
+        self.dbg_print(&format!(
+            "[get_container_image_tag]: Run Docker command: {cmd:?}"
+        ));
+
+        let container_image = match cmd.output() {
+            Ok(out) if out.status.success() => String::from_utf8_lossy(&out.stdout).to_string(),
+            Ok(out) => {
+                return Err(DockerError::from(format!(
+                    "[get_container_image_tag]: docker ps failed for {container_id} (exit {:?}): {}",
+                    out.status.code(),
+                    String::from_utf8_lossy(&out.stderr).trim(),
+                )));
+            }
             Err(e) => {
                 return Err(DockerError::from(format!(
                     "[get_container_image_tag]: Error getting container image for {container_id}: {e}"
@@ -195,19 +213,143 @@ impl DockerUtil {
             }
         };
 
-        if container_image.is_empty() {
+        if container_image.trim().is_empty() {
             return Err(DockerError::from(format!(
                 "[get_container_image_tag]: Error no image found for container ID: {container_id}",
             )));
         }
 
-        let parts = container_image.split(':').collect::<Vec<&str>>();
-        let tag = parts
-            .last()
-            .expect("[get_container_image_tag]: Failed to get container tag")
-            .trim()
-            .to_owned();
+        image_tag(&container_image)
+            .map(ToOwned::to_owned)
+            .ok_or_else(|| {
+                DockerError::from(format!(
+                    "[get_container_image_tag]: Image {} for container ID {container_id} carries no tag",
+                    container_image.trim(),
+                ))
+            })
+    }
+}
 
-        Ok(tag)
+/// Builds a `docker ps` name filter that matches `container_id` and nothing else.
+///
+/// Docker matches the name filter as a regular expression anywhere within the name, so an
+/// unanchored filter for `nginx-80` also matches `nginx-8080` and would report the wrong
+/// container as running.
+fn exact_name_filter(container_id: &str) -> String {
+    // A dot is the only regular expression metacharacter Docker permits in a container name.
+    format!("--filter=name=^{}$", container_id.replace('.', "\\."))
+}
+
+/// Extracts the port from a container ID of the form `<name>-<port>`.
+///
+/// Returns an error rather than panicking, because container IDs reach the public API
+/// straight from the caller and need not carry a port suffix at all.
+fn container_port_from_id(container_id: &str) -> Result<u16, DockerError> {
+    container_id
+        .rsplit('-')
+        .next()
+        .and_then(|port| port.trim().parse::<u16>().ok())
+        .ok_or_else(|| {
+            DockerError::from(format!(
+                "[get_running_container]: Failed to read the port from container ID \
+                 {container_id}. Expected an ID of the form <name>-<port>.",
+            ))
+        })
+}
+
+/// Extracts the tag from an image reference such as `nginx:1.27.0`.
+///
+/// A registry host may carry a port, as in `registry.io:5000/image`, so a colon only starts
+/// a tag when no path separator follows it.
+fn image_tag(image: &str) -> Option<&str> {
+    let image = image.trim();
+    let last_colon = image.rfind(':')?;
+
+    if image[last_colon..].contains('/') {
+        // The colon belongs to the registry host, so the reference carries no tag.
+        return None;
+    }
+
+    Some(&image[last_colon + 1..])
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_exact_name_filter_anchors_the_pattern() {
+        // Without the anchors Docker also matches nginx-8080 for a nginx-80 lookup.
+        assert_eq!(exact_name_filter("nginx-80"), "--filter=name=^nginx-80$");
+    }
+
+    #[test]
+    fn test_exact_name_filter_escapes_dots() {
+        // A dot is a regular expression wildcard and the only metacharacter Docker allows
+        // in a container name.
+        assert_eq!(
+            exact_name_filter("my.app-80"),
+            "--filter=name=^my\\.app-80$"
+        );
+    }
+
+    #[test]
+    fn test_container_port_from_id() {
+        assert_eq!(container_port_from_id("nginx-80").unwrap(), 80);
+        assert_eq!(container_port_from_id("my-app-8080").unwrap(), 8080);
+        assert_eq!(container_port_from_id("postgres-5432").unwrap(), 5432);
+    }
+
+    #[test]
+    fn test_container_port_from_id_without_port_suffix() {
+        // Must report an error rather than panicking: container IDs arrive from the caller
+        // and are not required to carry a port suffix.
+        let res = container_port_from_id("redis");
+        assert!(res.is_err());
+        assert!(res.unwrap_err().to_string().contains("redis"));
+    }
+
+    #[test]
+    fn test_container_port_from_id_rejects_out_of_range_port() {
+        // 70000 does not fit a u16.
+        assert!(container_port_from_id("service-70000").is_err());
+    }
+
+    #[test]
+    fn test_container_port_from_id_rejects_empty_suffix() {
+        assert!(container_port_from_id("service-").is_err());
+    }
+
+    #[test]
+    fn test_image_tag() {
+        assert_eq!(image_tag("nginx:1.27.0"), Some("1.27.0"));
+        assert_eq!(image_tag("postgres:17-alpine3.20"), Some("17-alpine3.20"));
+    }
+
+    #[test]
+    fn test_image_tag_trims_command_output() {
+        // docker ps terminates its output with a newline.
+        assert_eq!(image_tag("nginx:1.27.0\n"), Some("1.27.0"));
+    }
+
+    #[test]
+    fn test_image_tag_of_registry_path() {
+        assert_eq!(
+            image_tag("asia-northeast1-docker.pkg.dev/project/repo/api:b422ae3"),
+            Some("b422ae3")
+        );
+    }
+
+    #[test]
+    fn test_image_tag_ignores_registry_port() {
+        // The colon introduces the registry port, not a tag, so there is no tag to report.
+        assert_eq!(image_tag("registry.io:5000/image"), None);
+        // With a tag present the registry port must not confuse the lookup.
+        assert_eq!(image_tag("registry.io:5000/image:1.0"), Some("1.0"));
+    }
+
+    #[test]
+    fn test_image_tag_of_untagged_image() {
+        assert_eq!(image_tag("nginx"), None);
     }
 }

@@ -87,6 +87,7 @@ impl DockerUtil {
     ///         None,
     ///         Some(&["POSTGRES_PASSWORD=secret"]),
     ///         None,
+    ///         false, // Publish ports rather than using the host network
     ///         true,
     ///         false,
     ///         WaitStrategy::WaitUntilConsoleOutputContains(
@@ -164,6 +165,7 @@ impl DockerUtil {
     ///         None,
     ///         None,
     ///         None,
+    ///         false, // Publish ports rather than using the host network
     ///         true,
     ///         false,
     ///         WaitStrategy::default(),

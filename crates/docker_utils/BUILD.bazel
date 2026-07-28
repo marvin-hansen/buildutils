@@ -1,4 +1,4 @@
-load("@rules_rust//rust:defs.bzl", "rust_doc", "rust_doc_test", "rust_library")
+load("@rules_rust//rust:defs.bzl", "rust_doc", "rust_doc_test", "rust_library", "rust_test")
 
 rust_library(
     name = "docker_utils",
@@ -19,6 +19,15 @@ rust_library(
         "//thirdparty/crates:bon",
         "//thirdparty/crates:tokio",
     ],
+)
+
+# Runs the #[cfg(test)] modules inside src/. These do not drive Docker, so they need no
+# daemon, unlike the integration tests under tests/.
+rust_test(
+    name = "lib_unit_tests",
+    crate = ":docker_utils",
+    tags = ["unit-test"],
+    visibility = ["//visibility:public"],
 )
 
 rust_doc(

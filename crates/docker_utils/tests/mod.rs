@@ -5,3 +5,4 @@
 
 mod container_config_tests;
 mod docker_util_tests;
+mod host_network_tests;

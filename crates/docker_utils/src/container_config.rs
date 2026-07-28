@@ -28,6 +28,23 @@ use bon::Builder;
 ///         .build();
 /// ```
 ///
+/// Creating a configuration that runs the container on the host network:
+/// ```rust
+///  use docker_utils::*;
+///
+///     let config = ContainerConfig::builder()
+///         .name("test_container")
+///         .image("test_image")
+///         .tag("latest")
+///         .url("0.0.0.0")
+///         .connection_port(8080)
+///         .reuse_container(true)
+///         .keep_configuration(true)
+///         .host_network(true)
+///         .wait_strategy(WaitStrategy::NoWait)
+///         .build();
+/// ```
+///
 #[derive(Builder, Debug, Default, Clone, Eq, PartialOrd, Ord, PartialEq, Hash)]
 pub struct ContainerConfig<'l> {
     name: &'l str,
@@ -40,6 +57,12 @@ pub struct ContainerConfig<'l> {
     additional_ports: Option<&'l [u16]>,
     additional_env_vars: Option<&'l [&'l str]>,
     platform: Option<&'l str>,
+    /// Run the container on the host network instead of publishing ports.
+    ///
+    /// Optional in the builder and defaults to `false`, so existing configurations
+    /// keep publishing ports exactly as before.
+    #[builder(default)]
+    host_network: bool,
     wait_strategy: WaitStrategy,
 }
 
@@ -55,6 +78,9 @@ impl<'l> ContainerConfig<'l> {
     /// * `connection_port` - The port number for the main connection i.e. 80 for a webserver.
     /// * `additional_ports` - An optional array of additional ports to publish.
     /// * `platform` - An optional platform string in case the container image is not multi-arch.
+    /// * `host_network` - Run the container on the host network instead of publishing ports.
+    ///   When true, no port is published because Docker discards published ports in host
+    ///   network mode.
     /// * `reuse_container` - A boolean flag indicating whether to reuse an existing container if found.
     /// * `keep_configuration` -  A boolean flag indication whether to keep the configuration upon
     ///   every environment setup. If set to true, the same configuration will be used across all
@@ -76,6 +102,7 @@ impl<'l> ContainerConfig<'l> {
     ///         Some(&[8081, 8082]),
     ///         Some(&["ENV_VAR=VALUE", "DEBUG=true"]),
     ///         Some("linux/amd64"),
+    ///         false, // Publish ports rather than using the host network
     ///         true,
     ///         false,
     ///         WaitStrategy::default(), // NoWait is the default wait strategy
@@ -96,6 +123,7 @@ impl<'l> ContainerConfig<'l> {
         additional_ports: Option<&'l [u16]>,
         additional_env_vars: Option<&'l [&'l str]>,
         platform: Option<&'l str>,
+        host_network: bool,
         reuse_container: bool,
         keep_configuration: bool,
         wait_strategy: WaitStrategy,
@@ -111,6 +139,7 @@ impl<'l> ContainerConfig<'l> {
             additional_ports,
             additional_env_vars,
             platform,
+            host_network,
             wait_strategy,
         }
     }
@@ -157,6 +186,14 @@ impl<'l> ContainerConfig<'l> {
     pub const fn keep_configuration(&self) -> bool {
         self.keep_configuration
     }
+    /// Whether the container runs on the host network.
+    ///
+    /// When true, the container is started with `--network host` and no ports are
+    /// published, because Docker discards published ports in host network mode.
+    #[inline]
+    pub const fn host_network(&self) -> bool {
+        self.host_network
+    }
     #[inline]
     pub const fn wait_strategy(&self) -> &WaitStrategy {
         &self.wait_strategy
@@ -176,7 +213,8 @@ impl Display for ContainerConfig<'_> {
         write!(
             f,
             "name: {}, image: {}:{}, url: {} connection_port: {}, additional_ports: {:?}, \
-            additional_env_vars: {:?}, platform: {:?},  reuse_container: {}, keep_configuration: {}, wait_strategy: {}",
+            additional_env_vars: {:?}, platform: {:?},  reuse_container: {}, keep_configuration: {}, \
+            host_network: {}, wait_strategy: {}",
             self.name,
             self.image,
             self.tag,
@@ -187,6 +225,7 @@ impl Display for ContainerConfig<'_> {
             self.platform,
             self.reuse_container,
             self.keep_configuration,
+            self.host_network,
             self.wait_strategy,
         )
     }

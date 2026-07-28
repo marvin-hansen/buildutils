@@ -54,6 +54,7 @@ other situation where you have to work with disposable containers. Docker Utils 
 - ⚙️ **Flexible Configuration**
   - Environment variable support.
   - Platform-specific configurations.
+  - Published ports or host networking.
   - Container reuse options.
   - Easy builder pattern support.
 
@@ -64,7 +65,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-docker_utils = "0.1.0"
+docker_utils = "0.2"
 ```
 
 ## Quick Start
@@ -83,8 +84,8 @@ let (container_name, port) = docker_util
     .setup_container(&container_config)
     .expect("Failed to start container");
 
-// Stop the container when done
-docker_util.stop_container(&container_name)
+// Stop the container when done. The second argument deletes it after stopping.
+docker_util.stop_container(&container_name, true)
     .expect("Failed to stop container");
 ```
 
@@ -141,11 +142,46 @@ use docker_utils::*;
         Some(&[8081, 8082]),
         Some(&["ENV_VAR=VALUE", "DEBUG=true"]),
         Some("linux/amd64"),
+        false, // host_network: publish ports rather than share the host's network
         true,
         false,
         WaitStrategy::default(), // NoWait is the default wait strategy
     );
 ```  
+
+## Host Networking 🌐
+
+By default the container publishes its ports, mapping `connection_port` and any
+`additional_ports` onto the host. Set `host_network` to run the container in Docker's host
+network mode instead, where it shares the host's network namespace and binds the host's ports
+directly:
+
+```rust
+use docker_utils::*;
+
+    let config = ContainerConfig::builder()
+        .name("test_container")
+        .image("test_image")
+        .tag("latest")
+        .url("0.0.0.0")
+        .connection_port(8080)
+        .host_network(true)
+        .reuse_container(true)
+        .keep_configuration(true)
+        .wait_strategy(WaitStrategy::NoWait)
+        .build();
+```  
+
+In host network mode no port is published, because Docker discards published ports in that
+mode and warns about it. Ports are still validated, so a zero port is still reported as a
+configuration error.
+
+`host_network` is optional in the builder and defaults to `false`, so existing configurations
+keep publishing ports exactly as before. The `ContainerConfig::new` constructor takes it as an
+explicit argument, positioned after `platform`.
+
+Note that host networking is a Linux feature. Docker Desktop runs containers inside a VM,
+where host network mode does not expose the container on the macOS or Windows host.
 
 ## Wait Strategies 🕒
 
@@ -161,6 +197,10 @@ The crate provides several wait strategies through the `wait_utils` dependency:
 The crate uses a custom `DockerError` type for comprehensive error handling, making it easy to identify 
 and handle Docker-related issues in your application.
 
+When a Docker command fails, the returned `DockerError` carries the command's exit status and
+its stderr, so the cause is reported where it happens rather than surfacing later as an
+unexplained wait timeout.
+
 ## Examples
 
 Check out the [example directory](../../examples/docker_utils_example) for complete working examples, including:
@@ -171,7 +211,7 @@ Check out the [example directory](../../examples/docker_utils_example) for compl
 ## Requirements
 
 - Docker daemon running on your system
-- Rust 1.80
+- Rust 1.90
 
 ## Contributing
 

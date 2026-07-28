@@ -4,6 +4,7 @@ rust_test_suite(
     name = "integration_tests",
     srcs = glob([
         "docker_util_tests.rs",
+        "host_network_tests.rs",
     ]),
     exec_properties = {
         # Tell BuildBuddy to run this test using a Firecracker microVM.

@@ -15,15 +15,22 @@ impl DockerUtil {
     /// # Errors
     ///
     /// Returns a `DockerError` if there is an error executing the `docker system prune` command.
+    /// Note that this waits for the prune to complete. Spawning without waiting would return
+    /// before anything had been removed and would discard any failure reported by Docker.
     pub(crate) fn prune(&mut self) -> Result<(), DockerError> {
         match Command::new("docker")
             .arg("system")
             .arg("prune")
             .arg("--all")
             .arg("--force")
-            .spawn()
+            .output()
         {
-            Ok(_) => Ok(()),
+            Ok(out) if out.status.success() => Ok(()),
+            Ok(out) => Err(DockerError::from(format!(
+                "Error pruning containers: docker system prune failed (exit {:?}): {}",
+                out.status.code(),
+                String::from_utf8_lossy(&out.stderr).trim(),
+            ))),
             Err(e) => Err(DockerError::from(format!("Error pruning containers: {e}"))),
         }
     }

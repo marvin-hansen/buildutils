@@ -4,6 +4,7 @@
  */
 
 use docker_utils::{ContainerConfig, DockerUtil, WaitStrategy};
+use std::process::Command;
 
 fn get_test_container_config() -> ContainerConfig<'static> {
     ContainerConfig::new(
@@ -15,8 +16,9 @@ fn get_test_container_config() -> ContainerConfig<'static> {
         None,
         None,
         None,
-        true, // Keep the container running for re-use
-        true, // Keep the same container config across all env. setups.
+        false, // Publish ports rather than using the host network
+        true,  // Keep the container running for re-use
+        true,  // Keep the same container config across all env. setups.
         WaitStrategy::WaitUntilConsoleOutputContains(
             "Configuration complete; ready for start up".to_string(),
             15,
@@ -102,4 +104,147 @@ async fn test_container_stopped(docker_util: &DockerUtil, container_id: &str) {
     let res = docker_util.check_if_container_is_running(container_id);
     assert!(res.is_ok());
     assert!(!res.unwrap());
+}
+
+// Port and container names are exclusive to the failure test below so that it cannot
+// interfere with the container used in test_docker_util, which runs in parallel.
+const CONFLICT_PORT: u16 = 8099;
+const CONFLICT_OCCUPANT: &str = "docker-utils-occupant";
+const CONFLICT_CONTENDER: &str = "docker-utils-contender";
+
+fn get_conflict_container_config(name: &'static str) -> ContainerConfig<'static> {
+    ContainerConfig::new(
+        name,
+        "nginx",
+        "1.27.0",
+        "0.0.0.0",
+        CONFLICT_PORT,
+        None,
+        None,
+        None,
+        false, // Publish ports, so that the second container conflicts on the same port.
+        false, // Do not reuse, so that a second start is genuinely attempted.
+        false,
+        WaitStrategy::NoWait,
+    )
+}
+
+/// A failing `docker run` must be reported as an error.
+///
+/// Previously the exit status was ignored and stderr discarded, so a container that never
+/// started was waited on until the wait strategy timed out, hiding the actual cause.
+#[tokio::test]
+async fn test_start_container_reports_docker_run_failure() {
+    let docker_util = DockerUtil::new().expect("Failed to create DockerUtil");
+
+    // Occupy the port with a first container.
+    let occupant = get_conflict_container_config(CONFLICT_OCCUPANT);
+    let res = docker_util.get_or_start_container(&occupant);
+    assert!(res.is_ok(), "Failed to start the first container: {res:?}");
+
+    // A second container cannot bind the same host port, so `docker run` exits non-zero.
+    let contender = get_conflict_container_config(CONFLICT_CONTENDER);
+    let res = docker_util.get_or_start_container(&contender);
+
+    // Clean up before asserting so that a failed assertion does not leak the container.
+    let occupant_id = format!("{CONFLICT_OCCUPANT}-{CONFLICT_PORT}");
+    docker_util
+        .stop_container(&occupant_id, true)
+        .expect("Failed to stop the first container");
+
+    let err = res.expect_err("Starting a container on an occupied port must fail");
+    let msg = err.to_string();
+
+    // The error must name the failing command and carry Docker's own stderr, rather than
+    // surfacing later as an unexplained wait timeout.
+    assert!(
+        msg.contains("docker run failed"),
+        "Error must report the failed docker run, got: {msg}"
+    );
+    assert!(
+        msg.contains(&CONFLICT_PORT.to_string()),
+        "Error must carry Docker's stderr naming the conflicting port, got: {msg}"
+    );
+}
+
+/// Starts a container directly, bypassing the crate, and returns a guard-like closure input.
+///
+/// No port is published, so these containers cannot collide with anything else on the host.
+fn run_bare_container(name: &str) {
+    let out = Command::new("docker")
+        .args(["run", "--rm", "--detach", "--name", name, "nginx:1.27.0"])
+        .output()
+        .expect("Failed to run docker");
+
+    assert!(
+        out.status.success(),
+        "Failed to start {name}: {}",
+        String::from_utf8_lossy(&out.stderr).trim()
+    );
+}
+
+fn remove_bare_container(name: &str) {
+    Command::new("docker")
+        .args(["rm", "-f", name])
+        .output()
+        .expect("Failed to remove container");
+}
+
+/// A container ID must be matched exactly.
+///
+/// Docker matches the `name` filter as an unanchored regular expression, so looking up
+/// `<name>-808` previously also matched `<name>-8080` and reported it as running.
+#[tokio::test]
+async fn test_check_running_matches_the_container_id_exactly() {
+    let docker_util = DockerUtil::new().expect("Failed to create DockerUtil");
+
+    let running = "docker-utils-exact-8080";
+    let prefix_of_running = "docker-utils-exact-808";
+
+    run_bare_container(running);
+
+    let exact = docker_util.check_if_container_is_running(running);
+    let prefix = docker_util.check_if_container_is_running(prefix_of_running);
+
+    remove_bare_container(running);
+
+    assert!(
+        exact.expect("Failed to check the running container"),
+        "The container itself must be reported as running"
+    );
+    assert!(
+        !prefix.expect("Failed to check the prefix"),
+        "{prefix_of_running} is not running and must not be matched by {running}"
+    );
+}
+
+/// A container ID need not carry a `-<port>` suffix.
+///
+/// The port used to be parsed out of the ID with an `expect`, so checking a container whose
+/// name has no numeric suffix panicked instead of returning a result.
+#[tokio::test]
+async fn test_check_running_for_container_without_port_suffix() {
+    let docker_util = DockerUtil::new().expect("Failed to create DockerUtil");
+    let name = "dockerutilsnoportsuffix";
+
+    run_bare_container(name);
+
+    let res = docker_util.check_if_container_is_running(name);
+
+    remove_bare_container(name);
+
+    assert!(
+        res.expect("Checking a container without a port suffix must not fail"),
+        "The container must be reported as running"
+    );
+}
+
+/// Stopping a container that is not running must be reported as an error.
+#[tokio::test]
+async fn test_stop_container_that_is_not_running() {
+    let docker_util = DockerUtil::new().expect("Failed to create DockerUtil");
+
+    let res = docker_util.stop_container("docker-utils-never-started-1234", true);
+
+    assert!(res.is_err(), "Stopping an absent container must fail");
 }
