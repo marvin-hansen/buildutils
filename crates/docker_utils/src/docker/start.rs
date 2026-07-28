@@ -205,7 +205,7 @@ impl DockerUtil {
             Err(e) => {
                 return Err(DockerError::from(format!(
                     "Error starting container {container_id}: {e}"
-                )))
+                )));
             }
         };
 
@@ -229,7 +229,7 @@ impl DockerUtil {
                 Err(e) => {
                     return Err(DockerError::from(format!(
                         "Error running docker ps -a for container {container_id} due to error: {e}"
-                    )))
+                    )));
                 }
             };
         }

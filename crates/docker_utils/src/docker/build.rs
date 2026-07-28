@@ -4,7 +4,7 @@
  */
 
 use crate::{DockerError, DockerUtil};
-use std::process::{exit, Command};
+use std::process::{Command, exit};
 
 impl DockerUtil {
     /// Builds a new DockerUtil instance.

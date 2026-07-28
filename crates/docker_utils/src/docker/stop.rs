@@ -34,9 +34,9 @@ impl DockerUtil {
             let mut stop_cmd = Command::new("docker");
             match delete {
                 // https://stackoverflow.com/questions/35122773/single-command-to-stop-and-remove-docker-container
-                true => stop_cmd.arg("rm").arg("-f").arg(container_id.to_owned()),
+                true => stop_cmd.arg("rm").arg("-f").arg(container_id),
                 // https://spacelift.io/blog/docker-stop-container
-                false => stop_cmd.arg("stop").arg(container_id.to_owned()),
+                false => stop_cmd.arg("stop").arg(container_id),
             };
 
             self.dbg_print("[stop_container]: Container exists. Stopping it.");

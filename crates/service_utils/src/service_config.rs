@@ -48,7 +48,7 @@ use wait_utils::WaitStrategy;
 pub struct ServiceStartConfig {
     program: &'static str,
     wait_strategy: WaitStrategy,
-    program_args: Option<Vec< &'static str,>>,
+    program_args: Option<Vec<&'static str>>,
     env_vars: Option<Vec<(String, String)>>,
 }
 
@@ -77,7 +77,7 @@ impl ServiceStartConfig {
     pub fn new(
         program: &'static str,
         wait_strategy: WaitStrategy,
-        program_args: Option<Vec< &'static str,>>,
+        program_args: Option<Vec<&'static str>>,
         env_vars: Option<Vec<(String, String)>>,
     ) -> Self {
         Self {
@@ -95,16 +95,13 @@ impl ServiceStartConfig {
         self.program
     }
 
-
-
     #[inline]
     pub const fn wait_strategy(&self) -> &WaitStrategy {
         &self.wait_strategy
     }
 
     #[inline]
-    pub const fn env_vars(&self) -> &Option<Vec<(String, String)>>
-    {
+    pub const fn env_vars(&self) -> &Option<Vec<(String, String)>> {
         &self.env_vars
     }
     #[inline]

@@ -7,18 +7,23 @@ use service_utils::{ServiceStartConfig, WaitStrategy};
 
 #[test]
 fn test_service_config_basic() {
-    let config = ServiceStartConfig::new("test_program", WaitStrategy::NoWait, None);
+    let config = ServiceStartConfig::new("test_program", WaitStrategy::NoWait, None, None);
 
     assert_eq!(config.program(), "test_program");
     assert_eq!(config.wait_strategy(), &WaitStrategy::NoWait);
+    assert_eq!(config.program_args(), &None);
     assert_eq!(config.env_vars(), &None);
 }
 
 #[test]
 fn test_service_config_with_env_vars() {
     let env_vars = vec![("key".into(), "value".into())];
-    let config =
-        ServiceStartConfig::new("test_program", WaitStrategy::NoWait, Some(env_vars.clone()));
+    let config = ServiceStartConfig::new(
+        "test_program",
+        WaitStrategy::NoWait,
+        None,
+        Some(env_vars.clone()),
+    );
 
     assert_eq!(config.program(), "test_program");
     assert_eq!(config.wait_strategy(), &WaitStrategy::NoWait);
@@ -31,6 +36,7 @@ fn test_service_config_with_wait_strategy() {
     let config = ServiceStartConfig::new(
         "test_program",
         WaitStrategy::WaitUntilConsoleOutputContains(wait_message.clone(), 10),
+        None,
         None,
     );
 
@@ -46,6 +52,7 @@ fn test_service_config_display() {
     let config = ServiceStartConfig::new(
         "test_program",
         WaitStrategy::NoWait,
+        None,
         Some(vec![("key".into(), "value".into())]),
     );
 
@@ -56,14 +63,29 @@ fn test_service_config_display() {
 
 #[test]
 fn test_service_config_clone_and_eq() {
-    let config1 = ServiceStartConfig::new("test_program", WaitStrategy::NoWait, None);
+    let config1 = ServiceStartConfig::new("test_program", WaitStrategy::NoWait, None, None);
 
     let config2 = config1.clone();
     assert_eq!(config1, config2);
 
-    let config3 = ServiceStartConfig::new("different_program", WaitStrategy::NoWait, None);
+    let config3 = ServiceStartConfig::new("different_program", WaitStrategy::NoWait, None, None);
 
     assert_ne!(config1, config3);
+}
+
+#[test]
+fn test_service_config_with_program_args() {
+    let program_args = vec!["--flag", "value"];
+    let config = ServiceStartConfig::new(
+        "test_program",
+        WaitStrategy::NoWait,
+        Some(program_args.clone()),
+        None,
+    );
+
+    assert_eq!(config.program(), "test_program");
+    assert_eq!(config.program_args(), &Some(program_args));
+    assert_eq!(config.env_vars(), &None);
 }
 
 #[test]
@@ -76,9 +98,9 @@ fn test_service_config_default() {
 
 #[test]
 fn test_service_config_ordering() {
-    let config1 = ServiceStartConfig::new("a_program", WaitStrategy::NoWait, None);
+    let config1 = ServiceStartConfig::new("a_program", WaitStrategy::NoWait, None, None);
 
-    let config2 = ServiceStartConfig::new("b_program", WaitStrategy::NoWait, None);
+    let config2 = ServiceStartConfig::new("b_program", WaitStrategy::NoWait, None, None);
 
     assert!(config1 < config2);
 }

@@ -19,20 +19,24 @@ impl ServiceUtil {
         let env_vars = service_start_config.env_vars().to_owned();
 
         // Start the service
-        self.start(program,program_args, env_vars, wait_strategy).await
+        self.start(program, program_args, env_vars, wait_strategy)
+            .await
     }
 
     pub(crate) async fn start(
         &self,
         program: &str,
-        program_args: Option<Vec< & str,>>,
+        program_args: Option<Vec<&str>>,
         env_vars: Option<Vec<(String, String)>>,
         wait_strategy: WaitStrategy,
     ) -> Result<(), ServiceUtilError> {
         // Check if the program is in the binaries vector
         if !self.binaries().contains(&program) {
-            return Err(ServiceUtilError::BinaryNotFound(format!("Binary has not been added to the ServiceUtil. \
-             Please add the following binary to the set of programs when constructing the ServiceUtil: {}", program)));
+            return Err(ServiceUtilError::BinaryNotFound(format!(
+                "Binary has not been added to the ServiceUtil. \
+             Please add the following binary to the set of programs when constructing the ServiceUtil: {}",
+                program
+            )));
         }
 
         // Check if the binary in the full path still exists
@@ -40,7 +44,7 @@ impl ServiceUtil {
         if !std::path::Path::new(&bin).exists() {
             return Err(ServiceUtilError::BinaryNotFound(format!(
                 "Program {} not found in path: {}",
-                &program, &bin
+                program, bin
             )));
         }
 
@@ -70,7 +74,7 @@ impl ServiceUtil {
             cmd.args(program_args);
         }
 
-        self.dbg_print(&format!("Run start command: {:?}", &cmd));
+        self.dbg_print(&format!("Run start command: {:?}", cmd));
         cmd.spawn().expect("Failed to run command");
 
         self.dbg_print("Waiting for service to start");

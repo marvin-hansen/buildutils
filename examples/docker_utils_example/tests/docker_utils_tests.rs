@@ -43,7 +43,7 @@ fn test_docker_utils() {
     let res = docker_util.check_if_container_is_running(&container_id);
     assert!(res.is_ok());
     assert!(res.unwrap());
-    println!("container is running: {}", &container_id);
+    println!("container is running: {}", container_id);
 
     println!("test_stop_container");
     let delete_container = true;
@@ -54,5 +54,5 @@ fn test_docker_utils() {
     let res = docker_util.check_if_container_is_running(&container_id);
     assert!(res.is_ok());
     assert!(!res.unwrap());
-    println!("container deleted: {}", &container_id);
+    println!("container deleted: {}", container_id);
 }

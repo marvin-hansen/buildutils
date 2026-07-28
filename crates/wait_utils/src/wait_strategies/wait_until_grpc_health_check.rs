@@ -7,8 +7,8 @@ use crate::WaitStrategyError;
 use std::time::Duration;
 use tokio::time::Instant;
 use tonic::transport::Channel;
-use tonic_health::pb::health_client::HealthClient;
 use tonic_health::pb::HealthCheckRequest;
+use tonic_health::pb::health_client::HealthClient;
 
 /// Waits until a gRPC service at the given `health_url` is online by performing
 /// a health check. The health check is performed every 100ms until the service
