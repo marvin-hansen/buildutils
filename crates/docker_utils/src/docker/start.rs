@@ -137,8 +137,7 @@ impl DockerUtil {
 
         cmd.arg("run").arg("--rm").arg("--detach");
 
-        if platform.is_some() {
-            let p = platform.expect("Failed to unwrap Docker platform string");
+        if let Some(p) = platform {
             cmd.arg("--platform").arg(p);
         }
 
@@ -147,8 +146,8 @@ impl DockerUtil {
         cmd.arg("--publish").arg(port_publish);
 
         // Publish additional ports for the container, if applicable
-        if additional_ports.is_some() {
-            for port in additional_ports.expect("Failed to unwrap additional Docker ports") {
+        if let Some(additional_ports) = additional_ports {
+            for port in additional_ports {
                 if *port == 0 {
                     return Err(DockerError::from(format!(
                         "Error starting container {container_id}: Port cannot be 0.",
@@ -171,10 +170,8 @@ impl DockerUtil {
         cmd.arg(container_name);
 
         // Add env variables, if available
-        if additional_env_vars.is_some() {
+        if let Some(add_args) = additional_env_vars {
             // Add additional env variables
-            let add_args = additional_env_vars.unwrap();
-
             cmd.arg("-e");
             cmd.args(add_args);
         }

@@ -38,8 +38,7 @@ impl DockerUtil {
         let mut cmd = Command::new("docker");
         cmd.arg("pull");
 
-        if platform.is_some() {
-            let p = platform.expect("Failed to unwrap Docker platform string");
+        if let Some(p) = platform {
             cmd.arg("--platform").arg(p);
         }
 

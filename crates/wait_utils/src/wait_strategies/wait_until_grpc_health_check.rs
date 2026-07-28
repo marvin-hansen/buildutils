@@ -55,19 +55,13 @@ pub async fn wait_until_grpc_health_check(
                         break Ok(());
                     }
                     Err(e) => {
-                        println!(
-                            "{}",
-                            &format!("[wait_until_grpc_health_check]: Health check failed: {}", e)
-                        );
+                        println!("[wait_until_grpc_health_check]: Health check failed: {e}");
                         continue;
                     }
                 }
             }
             Err(e) => {
-                println!(
-                    "{}",
-                    &format!("[wait_until_grpc_health_check]: Connection failed: {}", e)
-                );
+                println!("[wait_until_grpc_health_check]: Connection failed: {e}");
                 continue;
             }
         }

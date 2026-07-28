@@ -58,24 +58,26 @@ impl ServiceUtil {
         self.dbg_print("Constructing start command");
         let mut cmd = Command::new(bin);
 
-        if env_vars.is_some() {
+        if let Some(env_vars) = env_vars {
             self.dbg_print("Setting environment variables");
-            let env_vars = env_vars.unwrap();
 
             // Add environment variables
             cmd.envs(env_vars);
         }
 
-        if program_args.is_some() {
+        if let Some(program_args) = program_args {
             self.dbg_print("Setting program arguments");
-            let program_args = program_args.unwrap();
 
             // Add program arguments
             cmd.args(program_args);
         }
 
         self.dbg_print(&format!("Run start command: {:?}", cmd));
-        cmd.spawn().expect("Failed to run command");
+        // The service is intentionally detached so that it outlives this call: `wait_for_program`
+        // below polls it until it is ready, so reaping it here with `wait()` would block forever.
+        // Consequently the child is left unreaped and turns into a zombie once it terminates.
+        #[allow(clippy::zombie_processes)]
+        let _child = cmd.spawn().expect("Failed to run command");
 
         self.dbg_print("Waiting for service to start");
         self.wait_for_program(&wait_strategy)

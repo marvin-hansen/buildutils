@@ -42,14 +42,11 @@ pub fn wait_until_http_health_check(
         if let Ok(out) = cmd.output() {
             if dbg {
                 println!(
-                    "{}",
-                    &format!(
-                        "[wait_until_http_health_check]: \n
+                    "[wait_until_http_health_check]: \n
                     success: {} \n
                     Output: {}",
-                        out.status.success(),
-                        String::from_utf8_lossy(out.stdout.as_slice()),
-                    )
+                    out.status.success(),
+                    String::from_utf8_lossy(out.stdout.as_slice()),
                 );
             }
 

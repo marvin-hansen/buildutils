@@ -57,8 +57,8 @@ impl<'l> ContainerConfig<'l> {
     /// * `platform` - An optional platform string in case the container image is not multi-arch.
     /// * `reuse_container` - A boolean flag indicating whether to reuse an existing container if found.
     /// * `keep_configuration` -  A boolean flag indication whether to keep the configuration upon
-    ///    every environment setup. If set to true, the same configuration will be used across all
-    ///    environment setups. If false, each setup will re-create all tables and import data.,
+    ///   every environment setup. If set to true, the same configuration will be used across all
+    ///   environment setups. If false, each setup will re-create all tables and import data.,
     /// * `wait_strategy` - The wait strategy to use for the container.
     ///
     /// Examples
