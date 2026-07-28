@@ -3,9 +3,8 @@ load("@rules_rust//rust:defs.bzl", "rust_test_suite")
 rust_test_suite(
     name = "integration_tests",
     srcs = glob([
-        "container_args_tests.rs",
-        "docker_util_tests.rs",
-        "host_network_tests.rs",
+        "console_output_tests.rs",
+        "http_health_check_tests.rs",
     ]),
     exec_properties = {
         # Tell BuildBuddy to run this test using a Firecracker microVM.
@@ -16,7 +15,7 @@ rust_test_suite(
         "test.recycle-runner": "true",
         # We don't want different different db tests to be assigned to the same recycled runner,
         # because we can't fit all db docker images with the default disk limit.
-        "test.runner-recycling-key": "docker_utils_integration_test",
+        "test.runner-recycling-key": "wait_utils_integration_test",
     },
     tags = [
         "integration_test",
@@ -24,18 +23,13 @@ rust_test_suite(
     visibility = ["//visibility:public"],
     deps = [
         # Crate under test
-        "//alias:docker_utils",
-        # Internal crates
-
-        # External crates
-        "//thirdparty/crates:tokio",
+        "//alias:wait_utils",
     ],
 )
 
 rust_test_suite(
     name = "unit_tests",
     srcs = glob([
-        "container_config_tests.rs",
         "utils_tests.rs",
     ]),
     tags = [
@@ -44,6 +38,6 @@ rust_test_suite(
     visibility = ["//visibility:public"],
     deps = [
         # Crate to test
-        "//alias:docker_utils",
+        "//alias:wait_utils",
     ],
 )

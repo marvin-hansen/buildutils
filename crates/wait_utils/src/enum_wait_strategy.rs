@@ -25,12 +25,14 @@ use std::fmt::{Display, Formatter};
 ///   console output contains a specific string or until a timeout occurs. This variant takes a `String`
 ///   representing the expected output to wait for and a `u64` representing the timeout in seconds.
 ///   This strategy is useful for containers that emit a specific log message or signal when they are ready.
+///   Both stdout and stderr are searched, so a service that logs its readiness to stderr matches too.
 ///
 /// - `WaitForHttpHealthCheck(url: String, timeout: u64)`: Wait until an HTTP request to the given URL
-///   returns a 200 status code or until a timeout occurs. This variant takes a `String` representing the URL to
+///   returns a success status code or until a timeout occurs. This variant takes a `String` representing the URL to
 ///   make the request to and a `u64` representing the timeout in seconds.
 ///   This strategy is useful for containers that expose an HTTP server and indicate their readiness
-///   by returning a 200 status code.
+///   through the status code. Any status of 400 or above keeps the wait going, so a health endpoint
+///   that reports "not ready yet" with a 503 is respected rather than taken for readiness.
 ///
 /// - `WaitForGrpcHealthCheck(url: String, timeout: u64)`: Wait until a gRPC request to the given URL
 ///   returns a successful response or until a timeout occurs. This variant takes a `String` representing the URL to

@@ -4,11 +4,15 @@
  */
 
 use crate::WaitStrategyError;
+use crate::utils_test::build_curl_args;
 use std::process::Command;
 use std::time::Duration;
 use tokio::time::Instant;
 
-/// Waits until the health check URL responds successfully.
+/// Waits until the health check URL responds with a success status.
+///
+/// Only a status below 400 counts as ready. A service that is already listening but reports
+/// itself as not ready, typically with a 503, keeps the wait going rather than ending it.
 ///
 /// # Arguments
 ///
@@ -37,16 +41,16 @@ pub fn wait_until_http_health_check(
         }
 
         let mut cmd = Command::new("curl");
-        cmd.arg(health_url);
+        cmd.args(build_curl_args(health_url));
 
         if let Ok(out) = cmd.output() {
             if dbg {
                 println!(
                     "[wait_until_http_health_check]: \n
                     success: {} \n
-                    Output: {}",
+                    Error: {}",
                     out.status.success(),
-                    String::from_utf8_lossy(out.stdout.as_slice()),
+                    String::from_utf8_lossy(out.stderr.as_slice()).trim(),
                 );
             }
 

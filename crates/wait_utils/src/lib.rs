@@ -5,6 +5,10 @@
 
 mod enum_wait_strategy;
 mod errors;
+/// Public only so that the test suite under `tests/` can reach it, and hidden from the
+/// documentation because it is not part of the supported API.
+#[doc(hidden)]
+pub mod utils_test;
 mod wait_strategies;
 
 pub use enum_wait_strategy::*;

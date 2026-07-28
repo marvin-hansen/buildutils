@@ -4,6 +4,7 @@
  */
 
 use crate::WaitStrategyError;
+use crate::utils_test::streams_contain;
 use std::process::Command;
 use std::time::Duration;
 use tokio::time::Instant;
@@ -11,6 +12,9 @@ use tokio::time::Instant;
 /// Waits until the console output of the container with the given ID contains the
 /// specified expected output. If the expected output is not found within the given
 /// timeout, an error is returned.
+///
+/// Both output streams of the container are searched, because `docker logs` keeps them
+/// apart and many services report their readiness on stderr.
 ///
 /// # Arguments
 ///
@@ -55,16 +59,17 @@ pub fn wait_until_console_output(
                 ))
             })?;
 
-        if output.status.success() {
+        if output.status.success()
+            && streams_contain(&output.stdout, &output.stderr, expected_output)
+        {
             if dbg {
                 println!("Service online");
             }
-            if String::from_utf8_lossy(&output.stdout).contains(expected_output) {
-                // Apparently, when the success log message appears in Docker,
-                // some services still need more time to become ready.
-                std::thread::sleep(Duration::from_millis(250));
-                break;
-            }
+
+            // Apparently, when the success log message appears in Docker,
+            // some services still need more time to become ready.
+            std::thread::sleep(Duration::from_millis(250));
+            break;
         }
     }
 
