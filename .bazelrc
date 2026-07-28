@@ -16,12 +16,6 @@ build --workspace_status_command=build/tools/workspace_status.sh
 # Instead, set a prefix and put it in .gitignore
 build --symlink_prefix=target-bzl/
 
-# Non-empty glob test is disabled because some Bazels deps fail the test.
-build --incompatible_disallow_empty_glob=false
-
-# This flag improves local execution throughput by executing more actions in parallel.
-build --jobs=18
-
 ###############################################################################
 ## Test configuration
 ###############################################################################
