@@ -11,8 +11,13 @@ pub fn postgres_db_container_config() -> ContainerConfig<'static> {
         .image("postgres")
         .tag("17-alpine3.20")
         .url("0.0.0.0")
+        // More than one variable is passed on purpose: each one has to reach Docker as its
+        // own -e flag, otherwise Docker reads the second one as the image name.
+        .additional_env_vars(&["POSTGRES_PASSWORD=postgres", "POSTGRES_DB=example"])
         .connection_port(5432)
-        .additional_env_vars(&["POSTGRES_PASSWORD=postgres"])
+        // Ports are published rather than shared with the host. Set host_network(true) to
+        // run the container on the host network instead.
+        .host_network(false)
         .reuse_container(true)
         .keep_configuration(true)
         .wait_strategy(WaitStrategy::WaitUntilConsoleOutputContains(

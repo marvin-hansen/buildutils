@@ -7,7 +7,8 @@ This example demonstrates how to use the `docker_utils` crate to manage Docker c
 - Container lifecycle management (start, stop, check status)
 - Postgres container configuration and setup
 - Error handling and status verification
-- Container port mapping
+- Container port mapping, with host networking available via `host_network(true)`
+- Multiple environment variables passed to the container
 
 
 ## Running the Example
@@ -33,4 +34,4 @@ The example will:
 
 ## Dependencies
 
-- docker_utils = "0.1.0"
+- docker_utils = "0.2"
