@@ -23,20 +23,14 @@ impl DockerUtil {
                         println!("[DockerUtil]: Docker is running");
                     }
                 } else {
-                    println!();
-                    println!(" ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️");
-                    println!("🚨🚨🚨 DockerUtil: Mayday Mayday 🚨🚨🚨");
-                    println!(" ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️");
-                    println!("🚨🚨🚨 Cannot connect to Docker  🚨🚨🚨");
-                    println!("🚨🚨🚨 Is Docker up & running?   🚨🚨🚨");
-                    println!(" ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️");
-                    println!("🚨🚨🚨 Help guide & documentation 🚨🚨🚨");
-                    println!("Install Docker: https://docs.docker.com/engine/install/");
-                    println!("Install Obstack: https://docs.orbstack.dev/quick-start");
+                    // `docker` ran but exited non-zero, i.e. the daemon is unreachable.
+                    print_docker_help("Cannot connect to Docker", "Is Docker up & running?");
                     exit(42)
                 }
             }
             Err(e) => {
+                // `docker` could not be spawned at all, i.e. it is not on PATH.
+                print_docker_help("Docker CLI was not found", "Is Docker installed?");
                 return Err(DockerError::new(&format!(
                     "Failed to check if Docker is running due to error: {e}"
                 )));
@@ -45,4 +39,16 @@ impl DockerUtil {
 
         Ok(Self { dbg })
     }
+}
+
+/// Prints the Docker help banner with a cause specific headline and hint.
+fn print_docker_help(headline: &str, hint: &str) {
+    println!();
+    println!(" ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️");
+    println!("🚨🚨🚨 {headline:<26} 🚨🚨🚨");
+    println!("🚨🚨🚨 {hint:<26} 🚨🚨🚨");
+    println!(" ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️");
+    println!("🚨🚨🚨 Help guide & documentation 🚨🚨🚨");
+    println!("Install Docker: https://docs.docker.com/engine/install/");
+    println!("Install Orbstack: https://docs.orbstack.dev/quick-start");
 }
