@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1](https://github.com/marvin-hansen/buildutils/compare/docker_utils-v0.3.0...docker_utils-v0.3.1) - 2026-07-28
+
+### Fixed
+
+- *(wait_utils)* respect the HTTP status and stderr when waiting
+
 ## [0.3.0](https://github.com/marvin-hansen/buildutils/compare/docker_utils-v0.2.4...docker_utils-v0.3.0) - 2026-07-28
 
 ### Added
