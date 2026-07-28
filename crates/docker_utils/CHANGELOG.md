@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0](https://github.com/marvin-hansen/buildutils/compare/docker_utils-v0.2.4...docker_utils-v0.3.0) - 2026-07-28
+
+### Added
+
+- *(docker_utils)* [**breaking**] add host networking and surface Docker failures
+
+### Other
+
+- Merge remote-tracking branch 'origin/main'
+- Fixed more lints and clippies
+- Fixed error reporting in DockerUitls
+- Code formatting, fixes, and linting
+
 ## [0.2.4](https://github.com/marvin-hansen/buildutils/compare/docker_utils-v0.2.3...docker_utils-v0.2.4) - 2025-10-07
 
 ### Other

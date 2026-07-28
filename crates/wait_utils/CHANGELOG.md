@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5](https://github.com/marvin-hansen/buildutils/compare/wait_utils-v0.1.4...wait_utils-v0.1.5) - 2026-07-28
+
+### Other
+
+- Merge remote-tracking branch 'origin/main'
+- Fixed more lints and clippies
+- Code formatting, fixes, and linting
+
 ## [0.1.4](https://github.com/marvin-hansen/buildutils/compare/wait_utils-v0.1.3...wait_utils-v0.1.4) - 2025-10-07
 
 ### Other
