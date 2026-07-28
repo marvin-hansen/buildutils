@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4](https://github.com/marvin-hansen/buildutils/compare/wait_utils-v0.1.3...wait_utils-v0.1.4) - 2025-10-07
+
+### Other
+
+- update Cargo.toml dependencies
+
 ## [0.1.3](https://github.com/marvin-hansen/buildutils/compare/wait_utils-v0.1.2...wait_utils-v0.1.3) - 2025-01-20
 
 ### Other
