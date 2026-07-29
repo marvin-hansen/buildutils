@@ -239,14 +239,37 @@ async fn test_check_running_for_container_without_port_suffix() {
     );
 }
 
-/// Stopping a container that is not running must be reported as an error.
+/// Deleting a container that is already gone is not an error.
+///
+/// Containers carry `--rm`, so Docker reaps them the moment they exit. A teardown that
+/// errored on the corpse would mask the failure that produced it, which is the more
+/// interesting one.
 #[tokio::test]
-async fn test_stop_container_that_is_not_running() {
+async fn test_deleting_a_container_that_is_already_gone_succeeds() {
     let docker_util = DockerUtil::new().expect("Failed to create DockerUtil");
 
     let res = docker_util.stop_container("docker-utils-never-started-1234", true);
 
-    assert!(res.is_err(), "Stopping an absent container must fail");
+    assert!(
+        res.is_ok(),
+        "deleting an absent container is the requested end state, got: {res:?}"
+    );
+}
+
+/// Stopping without deleting still reports an absent container.
+///
+/// The caller named a container to stop rather than a state to reach, so silence would hide
+/// a typo or a container that never started.
+#[tokio::test]
+async fn test_stopping_a_container_that_is_not_running_is_reported() {
+    let docker_util = DockerUtil::new().expect("Failed to create DockerUtil");
+
+    let res = docker_util.stop_container("docker-utils-never-started-1234", false);
+
+    assert!(
+        res.is_err(),
+        "Stopping an absent container must be reported"
+    );
 }
 
 /// A wait strategy that times out must be reported, not panicked on.
@@ -283,12 +306,20 @@ async fn test_a_failing_wait_strategy_is_reported_rather_than_panicking() {
     remove_bare_container(&container_id);
 
     let err = res.expect_err("a health check that never passes must be reported");
+    let msg = err.to_string();
     assert!(
-        err.to_string().contains("HTTP health check"),
-        "the error must name the failing wait, got: {err}"
+        msg.contains("Timeout"),
+        "the error must say the wait timed out, got: {msg}"
     );
     assert!(
-        err.to_string().contains(&container_id),
-        "the error must name the container, got: {err}"
+        msg.contains(&container_id),
+        "the error must name the container, got: {msg}"
+    );
+    // D3: the post-mortem rides along, so a container that died is not reported as a bare
+    // timeout. Here it proves the opposite, that the container was alive and simply not
+    // serving HTTP, which is equally the thing a caller needs to know.
+    assert!(
+        msg.contains("status=") && msg.contains("oom="),
+        "the error must carry the container diagnostics, got: {msg}"
     );
 }

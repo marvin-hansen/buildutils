@@ -52,7 +52,9 @@ async fn test_service() {
         .start_service_from_config(get_service_start_config())
         .await;
     // dbg!(&res);
-    assert!(res.is_ok());
+    assert!(res.is_ok(), "{res:?}");
+    let pid = res.unwrap();
+    println!("Service started with PID {pid}");
 
     println!("Test service");
     let url = format!("{BASE_URL}hello");
@@ -69,6 +71,11 @@ async fn test_service() {
 
     println!("{resp:#?}");
     assert_eq!(resp.message, "Hello world!");
+
+    // Stop what we started. Under Bazel the sandbox would do it anyway, but under Cargo there
+    // is none, and a service left holding port 4242 makes the next run of this test fail.
+    println!("Stop service");
+    util.stop_service(pid).expect("Failed to stop the service");
 }
 
 fn get_root_path(bazel: bool) -> &'static str {

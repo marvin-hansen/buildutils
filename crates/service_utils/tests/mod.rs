@@ -5,3 +5,4 @@
 
 #[cfg(test)]
 mod service_config_test;
+mod service_util_test;

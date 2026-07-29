@@ -9,6 +9,12 @@ rust_test_suite(
     data = [
         ":copy_service",  # Copies the service binary into the test folder
     ],
+    # The test picks its root path from ENV, and the binary copied above lands under the
+    # Bazel path. Set here rather than relying on the caller passing --test_env, so that a
+    # plain `bazel test //...` works the same as `scripts/test.sh`.
+    env = {
+        "ENV": "LOCAL",
+    },
     tags = [
         "integration-test",
         "service_utils_example",

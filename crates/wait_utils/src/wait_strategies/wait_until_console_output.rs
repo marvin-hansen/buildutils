@@ -75,3 +75,47 @@ pub fn wait_until_console_output(
 
     Ok(())
 }
+
+/// One-shot form of the console check: do the container's logs contain `expected_output`?
+///
+/// Exposed so a driver can compose the check with its own retry loop and keep checking
+/// whatever else it knows about, such as whether the container is still alive. The looping
+/// [`wait_until_console_output`] cannot do that, because it knows nothing but the container ID.
+///
+/// # Arguments
+///
+/// * `dbg` - Whether to print the outcome of the check.
+/// * `container_id` - The ID of the container whose console output to check.
+/// * `expected_output` - The string to search for in the console output.
+///
+/// # Returns
+///
+/// Returns whether either output stream contains the expected output. A container whose logs
+/// cannot be read counts as not ready.
+///
+pub fn console_output_contains(dbg: bool, container_id: &str, expected_output: &str) -> bool {
+    match Command::new("docker")
+        .arg("logs")
+        .arg(container_id)
+        .output()
+    {
+        Ok(out) if out.status.success() => {
+            streams_contain(&out.stdout, &out.stderr, expected_output)
+        }
+        Ok(out) => {
+            if dbg {
+                println!(
+                    "[console_output_contains]: docker logs failed for {container_id}: {}",
+                    String::from_utf8_lossy(&out.stderr).trim()
+                );
+            }
+            false
+        }
+        Err(e) => {
+            if dbg {
+                println!("[console_output_contains]: failed to run docker logs: {e}");
+            }
+            false
+        }
+    }
+}

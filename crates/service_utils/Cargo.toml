@@ -23,3 +23,8 @@ workspace = true
 wait_utils = {workspace = true}
 # External crates
 bon = { workspace = true }
+
+[dev-dependencies]
+# Only the test suite needs an async runtime: the crate itself is async but drives no
+# runtime of its own.
+tokio = { workspace = true }

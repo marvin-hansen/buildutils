@@ -4,7 +4,7 @@
  */
 
 use crate::{DockerError, DockerUtil};
-use std::process::{Command, exit};
+use std::process::Command;
 
 impl DockerUtil {
     /// Builds a new DockerUtil instance.
@@ -24,8 +24,16 @@ impl DockerUtil {
                     }
                 } else {
                     // `docker` ran but exited non-zero, i.e. the daemon is unreachable.
+                    //
+                    // Reported rather than exited: a library must not terminate its caller's
+                    // process, least of all on a remote executor where the exit code is the
+                    // only artifact and no Result ever surfaces.
                     print_docker_help("Cannot connect to Docker", "Is Docker up & running?");
-                    exit(42)
+                    return Err(DockerError::new(&format!(
+                        "Cannot connect to Docker (docker version exited {:?}): {}",
+                        status.status.code(),
+                        String::from_utf8_lossy(&status.stderr).trim()
+                    )));
                 }
             }
             Err(e) => {

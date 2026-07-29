@@ -12,7 +12,8 @@ help:
 	@echo '    make format   	Formats call code according to cargo fmt style.'
 	@echo '    make lint   	Lints and formats the code of the project.'
 	@echo '    make fix   		Fixes linting issues as reported by clippy.'
-	@echo '    make test   	Tests across all crates.'
+	@echo '    make test   	Tests across all crates with Bazel.'
+	@echo '    make test_cargo	Tests across all crates with Cargo, staging binaries first.'
 	@echo '    make vendor         Vendors all Bazel managed Rust dependencies to folder thirdparty.'
 
 
@@ -43,6 +44,10 @@ fix:
 .PHONY: test
 test:
 	@source scripts/test.sh
+
+.PHONY: test_cargo
+test_cargo:
+	@source scripts/test_cargo.sh
 
 .PHONY: vendor
 vendor:

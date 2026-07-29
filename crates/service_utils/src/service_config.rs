@@ -15,6 +15,11 @@ use wait_utils::WaitStrategy;
 /// `env_var` is an optional environment variable to set when starting the
 /// service.
 ///
+/// The `host` and `port` are the address a caller would connect to. They live here rather
+/// than being discovered, because the address is a chicken and egg problem: the caller cannot
+/// connect until it knows the port, and the driver cannot bind until the caller has chosen
+/// one. The config is what breaks it, by being the single place both sides read.
+///
 /// # Examples
 ///
 /// Basic configuration using the derived builder:
@@ -50,6 +55,15 @@ pub struct ServiceStartConfig {
     wait_strategy: WaitStrategy,
     program_args: Option<Vec<&'static str>>,
     env_vars: Option<Vec<(String, String)>>,
+    /// The host a caller would connect to, handed to a readiness probe.
+    #[builder(default = "localhost")]
+    host: &'static str,
+    /// The port a caller would connect to, handed to a readiness probe.
+    ///
+    /// Optional because a service need not listen on one at all. It is required only by
+    /// [`WaitStrategy::WaitUntilReady`], which reports a clear error when it is missing
+    /// rather than probing a made-up address.
+    port: Option<u16>,
 }
 
 impl ServiceStartConfig {
@@ -67,7 +81,14 @@ impl ServiceStartConfig {
     /// ```rust
     /// use service_utils::*;
     ///
-    /// let config = ServiceStartConfig::new("program", WaitStrategy::NoWait, None, None);
+    /// let config = ServiceStartConfig::new(
+    ///     "program",
+    ///     WaitStrategy::NoWait,
+    ///     None,
+    ///     None,
+    ///     "localhost",
+    ///     Some(8080),
+    /// );
     /// ```
     ///
     /// # Returns
@@ -79,12 +100,16 @@ impl ServiceStartConfig {
         wait_strategy: WaitStrategy,
         program_args: Option<Vec<&'static str>>,
         env_vars: Option<Vec<(String, String)>>,
+        host: &'static str,
+        port: Option<u16>,
     ) -> Self {
         Self {
             program,
             wait_strategy,
             program_args,
             env_vars,
+            host,
+            port,
         }
     }
 }
@@ -108,14 +133,27 @@ impl ServiceStartConfig {
     pub fn program_args(&self) -> &Option<Vec<&'static str>> {
         &self.program_args
     }
+
+    /// The host a caller would connect to, handed to a readiness probe.
+    #[inline]
+    pub const fn host(&self) -> &'static str {
+        self.host
+    }
+
+    /// The port a caller would connect to, handed to a readiness probe.
+    #[inline]
+    pub const fn port(&self) -> Option<u16> {
+        self.port
+    }
 }
 
 impl Display for ServiceStartConfig {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "ServiceStartConfig {{ program: {}, wait_strategy: {}, env_vars: {:?} }}",
-            self.program, self.wait_strategy, self.env_vars
+            "ServiceStartConfig {{ program: {}, wait_strategy: {}, env_vars: {:?}, \
+            host: {}, port: {:?} }}",
+            self.program, self.wait_strategy, self.env_vars, self.host, self.port
         )
     }
 }

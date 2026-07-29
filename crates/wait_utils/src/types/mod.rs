@@ -4,3 +4,4 @@
  */
 pub mod enum_probe;
 pub mod enum_wait_strategy;
+pub mod probe_context;

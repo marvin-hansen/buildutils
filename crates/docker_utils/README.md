@@ -50,6 +50,7 @@ other situation where you have to work with disposable containers. Docker Utils 
   - Check container status.
   - Pull container images.
   - Prune unused containers.
+  - Collect a post-mortem when a container dies.
 
 - ⚙️ **Flexible Configuration**
   - Environment variable support.
@@ -65,7 +66,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-docker_utils = "0.2"
+docker_utils = "0.3"
 ```
 
 ## Quick Start
@@ -187,10 +188,77 @@ where host network mode does not expose the container on the macOS or Windows ho
 
 The crate provides several wait strategies through the `wait_utils` dependency:
 
+- `NoWait`: Return as soon as the container is started.
 - `WaitForDuration(u64)`: Wait for a specified number of seconds
 - `WaitUntilConsoleOutputContains(String, u64)`: Wait for a specified console output or until a timeout occurs.
 - `WaitForHttpHealthCheck(String, u64)`: Wait until an HTTP request to the given URL or until a timeout occurs.
-- `WaitForGrpcHealthCheck(u16, u64)`: Wait until an gRPC health request to the given URL or until a timeout occurs.
+- `WaitUntilReady { probe, timeout_secs, retry_delay_ms }`: Wait until your own probe reports ready.
+
+`WaitForGrpcHealthCheck` is not honoured here: it needs an async driver. Use `service_utils`,
+or express the check as `WaitUntilReady`. It is reported as unsupported rather than silently
+waiting.
+
+Whatever the strategy, the container is checked for liveness between attempts. A container that
+dies mid-wait aborts the wait immediately, instead of running out the clock and reporting a
+timeout that describes the symptom rather than the cause.
+
+### Readiness probes
+
+Every other strategy is a fixed predicate this crate implements. None of them can express "the
+operation I am about to perform succeeds", which is the only predicate that is never wrong: a
+database commonly accepts connections seconds before it accepts a schema change.
+
+```rust
+use docker_utils::{Probe, ProbeContext, WaitStrategy};
+
+fn container_is_ready(ctx: &ProbeContext) -> Probe<(), String> {
+    match TcpStream::connect((ctx.host(), ctx.port())) {
+        Ok(_) => Probe::Ready(()),
+        Err(e) => Probe::Retry(format!("attempt {}: {e}", ctx.attempt())),
+    }
+}
+
+let config = ContainerConfig::builder()
+    .name("my_service")
+    .image("my_image")
+    .tag("latest")
+    .url("127.0.0.1")
+    .connection_port(8080)
+    .wait_strategy(WaitStrategy::WaitUntilReady {
+        probe: container_is_ready,
+        timeout_secs: 60,
+        retry_delay_ms: 250,
+    })
+    .build();
+```
+
+The host and port the probe receives are the ones declared on the config. The probe runs on a
+thread of its own, so it may build its own async runtime even when `setup_container` was called
+from inside `#[tokio::test]`.
+
+## Container Diagnostics 🔎
+
+When a container dies mid-test the only evidence is its exit state, and `docker run --rm`
+deletes it seconds later. `container_diagnostics` collects the post-mortem while it still
+exists:
+
+```rust
+let diagnostics = docker_util.container_diagnostics(&container_name, 200)?;
+
+if diagnostics.looks_oom_killed() {
+    eprintln!("container ran out of memory:\n{diagnostics}");
+}
+```
+
+It reports the container's status, whether it is running, its restart count, its exit code and
+its log tail. `looks_oom_killed` checks both the OOM flag and exit code 137, because either
+alone is ambiguous.
+
+An OOM kill presents to a client as a bare connection error, because the server never got to
+write an explanation. This is what tells the two apart.
+
+Any wait failure already carries this post-mortem, so a timeout explains itself. Call it
+directly for a container that dies *after* the wait, while your test is using it.
 
 ## Error Handling
 
@@ -200,6 +268,14 @@ and handle Docker-related issues in your application.
 When a Docker command fails, the returned `DockerError` carries the command's exit status and
 its stderr, so the cause is reported where it happens rather than surfacing later as an
 unexplained wait timeout.
+
+Nothing in the crate terminates your process: an unreachable daemon, a failed pull and a wait
+timeout are all reported as errors, so a caller can still collect diagnostics before deciding
+what to do.
+
+`stop_container(id, true)` succeeds when the container is already gone. Deleting something
+absent is the requested end state, and `--rm` guarantees it after a crash, so a teardown error
+would only mask the failure that produced it.
 
 ## Examples
 

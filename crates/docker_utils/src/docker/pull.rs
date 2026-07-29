@@ -69,12 +69,9 @@ impl DockerUtil {
 
                 Ok(())
             }
-            Err(e) => {
-                eprintln!();
-                eprintln!("Error pulling container image {container_id}: {e}");
-                eprintln!();
-                panic!("")
-            }
+            Err(e) => Err(DockerError::from(format!(
+                "Error pulling container image {container_id}: failed to spawn docker pull: {e}"
+            ))),
         }
     }
 }

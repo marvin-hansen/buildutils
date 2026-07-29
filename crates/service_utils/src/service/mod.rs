@@ -8,6 +8,7 @@ mod dbg;
 mod display;
 mod getters;
 mod start;
+mod stop;
 mod verify;
 mod wait;
 

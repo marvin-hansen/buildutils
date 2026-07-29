@@ -3,7 +3,19 @@
  * Copyright (c) "2025" . The buildutils Authors and Contributors. All Rights Reserved.
  */
 
+use crate::{Probe, ProbeContext};
 use std::fmt::{Display, Formatter};
+
+/// One readiness attempt, supplied by the caller.
+///
+/// `Probe<(), String>` rather than a richer payload: a strategy answers "is it ready", it does
+/// not build the caller's client. A plain `fn` pointer rather than a boxed closure, because a
+/// `fn` implements `Debug`, `Clone`, `Copy`, `PartialEq`, `Eq`, `PartialOrd`, `Ord` and `Hash`,
+/// so [`WaitStrategy`] and everything holding one keeps every derive.
+///
+/// The probe therefore cannot capture state. It does not need to: the address is the state and
+/// [`ProbeContext`] carries it.
+pub type ProbeFn = fn(&ProbeContext) -> Probe<(), String>;
 
 /// Represents the strategy to wait for a container to reach a certain state.
 ///
@@ -41,9 +53,41 @@ use std::fmt::{Display, Formatter};
 ///   by returning a successful response.
 ///
 ///
+/// - `WaitUntilReady { probe, timeout_secs, retry_delay_ms }`: Wait until a caller-supplied probe
+///   reports ready, reports a fatal failure, or the timeout elapses. Every other variant is a
+///   fixed predicate this crate implements; this is the only one that can express "the operation
+///   I am about to perform succeeds", which is the only predicate that is never wrong. The probe
+///   is synchronous by contract, and each driver guarantees it runs with no ambient async
+///   runtime, so a probe may build one of its own.
+///
+/// # Which driver honours which variant
+///
+/// `WaitStrategy` is a shared vocabulary with two drivers: `docker_utils` applies it
+/// synchronously to containers, `service_utils` applies it asynchronously to locally started
+/// binaries. Not every variant can be honoured by both.
+///
+/// | Variant | docker_utils | service_utils |
+/// |---|---|---|
+/// | `NoWait` | yes | yes |
+/// | `WaitForDuration` | yes | yes |
+/// | `WaitUntilConsoleOutputContains` | yes | no, there is no container to read logs from |
+/// | `WaitForHttpHealthCheck` | yes | yes |
+/// | `WaitForGrpcHealthCheck` | no, the driver is synchronous | yes |
+/// | `WaitUntilReady` | yes | yes |
+///
+/// A driver that cannot honour a variant reports it as an error rather than waiting.
+///
 /// Note that the usage of these strategies depends on the specific requirements of the
 /// container and the context in which it is being started.
 ///
+// Comparing the probe compares a function address, which the compiler does not guarantee to
+// be unique: identical functions may be merged, and the same function may sit at different
+// addresses in different codegen units. The derives are kept regardless, because
+// `ContainerConfig` and `ServiceStartConfig` derive `Eq`, `Ord` and `Hash` and hold a
+// `WaitStrategy`; dropping them here would be a breaking change across both crates. The
+// practical consequence is only that two `WaitUntilReady` values may compare unequal even
+// when built from the same probe.
+#[allow(unpredictable_function_pointer_comparisons)]
 #[derive(Debug, Default, Clone, Eq, PartialOrd, Ord, PartialEq, Hash)]
 pub enum WaitStrategy {
     #[default]
@@ -52,6 +96,11 @@ pub enum WaitStrategy {
     WaitUntilConsoleOutputContains(String, u64),
     WaitForHttpHealthCheck(String, u64),
     WaitForGrpcHealthCheck(String, u64),
+    WaitUntilReady {
+        probe: ProbeFn,
+        timeout_secs: u64,
+        retry_delay_ms: u64,
+    },
 }
 
 impl Display for WaitStrategy {

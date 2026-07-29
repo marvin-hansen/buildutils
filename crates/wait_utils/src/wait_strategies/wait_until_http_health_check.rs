@@ -64,3 +64,42 @@ pub fn wait_until_http_health_check(
         }
     }
 }
+
+/// One-shot form of the HTTP health check: does the URL answer with a success status?
+///
+/// Exposed so a driver can compose the check with its own retry loop and keep checking
+/// whatever else it knows about, such as whether the container is still alive. The looping
+/// [`wait_until_http_health_check`] cannot do that, because it knows nothing but the URL.
+///
+/// # Arguments
+///
+/// * `dbg` - Whether to print the outcome of the check.
+/// * `health_url` - The URL to ping for health check.
+///
+/// # Returns
+///
+/// Returns whether the endpoint answered with a status below 400. Any failure to run curl at
+/// all counts as not ready.
+///
+pub fn http_check_ok(dbg: bool, health_url: &str) -> bool {
+    let mut cmd = Command::new("curl");
+    cmd.args(build_curl_args(health_url));
+
+    match cmd.output() {
+        Ok(out) => {
+            if dbg && !out.status.success() {
+                println!(
+                    "[http_check_ok]: {health_url} not ready: {}",
+                    String::from_utf8_lossy(out.stderr.as_slice()).trim()
+                );
+            }
+            out.status.success()
+        }
+        Err(e) => {
+            if dbg {
+                println!("[http_check_ok]: failed to run curl: {e}");
+            }
+            false
+        }
+    }
+}

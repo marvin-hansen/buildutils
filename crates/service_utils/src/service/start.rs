@@ -11,25 +11,30 @@ impl ServiceUtil {
     pub(crate) async fn start_config(
         &self,
         service_start_config: ServiceStartConfig,
-    ) -> Result<(), ServiceUtilError> {
+    ) -> Result<u32, ServiceUtilError> {
         // Extract parameters
         let program = service_start_config.program();
         let program_args = service_start_config.program_args().to_owned();
         let wait_strategy = service_start_config.wait_strategy().to_owned();
         let env_vars = service_start_config.env_vars().to_owned();
+        let host = service_start_config.host();
+        let port = service_start_config.port();
 
         // Start the service
-        self.start(program, program_args, env_vars, wait_strategy)
+        self.start(program, program_args, env_vars, host, port, wait_strategy)
             .await
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub(crate) async fn start(
         &self,
         program: &str,
         program_args: Option<Vec<&str>>,
         env_vars: Option<Vec<(String, String)>>,
+        host: &'static str,
+        port: Option<u16>,
         wait_strategy: WaitStrategy,
-    ) -> Result<(), ServiceUtilError> {
+    ) -> Result<u32, ServiceUtilError> {
         // Check if the program is in the binaries vector
         if !self.binaries().contains(&program) {
             return Err(ServiceUtilError::BinaryNotFound(format!(
@@ -73,18 +78,26 @@ impl ServiceUtil {
         }
 
         self.dbg_print(&format!("Run start command: {:?}", cmd));
+
         // The service is intentionally detached so that it outlives this call: `wait_for_program`
         // below polls it until it is ready, so reaping it here with `wait()` would block forever.
-        // Consequently the child is left unreaped and turns into a zombie once it terminates.
+        // Its PID is returned instead, so the caller can stop it with `stop_service`.
+        //
+        // Under Bazel this is optional housekeeping, because the sandbox takes the process down
+        // with it. Under Cargo there is no sandbox, so a service left running holds its port
+        // until the machine is rebooted, and the next run of the same test cannot bind.
         #[allow(clippy::zombie_processes)]
-        let _child = cmd.spawn().expect("Failed to run command");
+        let child = cmd.spawn().map_err(|e| {
+            ServiceUtilError::ServiceStartFailed(format!("could not start '{program}': {e}"))
+        })?;
+        let pid = child.id();
 
-        self.dbg_print("Waiting for service to start");
-        self.wait_for_program(&wait_strategy)
-            .await
-            .expect("Failed to wait for program");
+        self.dbg_print(&format!("Waiting for service to start. PID: {pid}"));
+        self.wait_for_program(program, host, port, &wait_strategy)
+            .await?;
 
         self.dbg_print("Service started");
-        Ok(())
+
+        Ok(pid)
     }
 }

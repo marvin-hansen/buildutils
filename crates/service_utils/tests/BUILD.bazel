@@ -1,0 +1,33 @@
+load("@rules_rust//rust:defs.bzl", "rust_test_suite")
+
+rust_test_suite(
+    name = "unit_tests",
+    srcs = glob([
+        "service_config_test.rs",
+    ]),
+    tags = [
+        "unit-test",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        # Crate to test
+        "//alias:service_utils",
+    ],
+)
+
+rust_test_suite(
+    name = "integration_tests",
+    srcs = glob([
+        "service_util_test.rs",
+    ]),
+    tags = [
+        "integration-test",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        # Crate under test
+        "//alias:service_utils",
+        # External crates
+        "//thirdparty/crates:tokio",
+    ],
+)

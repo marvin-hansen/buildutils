@@ -1,6 +1,10 @@
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
 
+# Arbitrary context that helps coding agents
+/ctx/
+/ctx/*
+
 # Cargo stuff
 debug/
 debug/*
@@ -37,3 +41,7 @@ Cargo.lock
 
 # windsurf rules
 .windsurfrules
+
+# Service binary staged by scripts/test_cargo.sh so Cargo can run the service_utils example.
+# Bazel materialises its own copy from the test target's data, so this is a local artifact.
+/examples/service_utils_example/tests/service

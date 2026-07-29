@@ -4,7 +4,6 @@
  */
 
 use std::fmt::Display;
-use std::future::Future;
 use std::time::{Duration, Instant};
 
 use crate::{Probe, WaitStrategyError};
@@ -107,96 +106,6 @@ where
         }
 
         std::thread::sleep(retry_delay);
-    }
-}
-
-/// Async counterpart of [`wait_until_ready`], for probes that are futures.
-///
-/// Provided because the readiness probe worth running is usually a real client call, and most
-/// Rust clients are async. Blocking on one from the sync variant panics when the caller is
-/// already inside a runtime, which is the normal case.
-///
-/// # Arguments
-///
-/// * `dbg` - Whether to print the progress of the wait.
-/// * `timeout` - How long to keep retrying before giving up.
-/// * `retry_delay` - How long to wait between attempts.
-/// * `probe` - The readiness check to run, returning a future.
-///
-/// # Returns
-///
-/// Returns whatever the probe built, or a `WaitStrategyError` if the probe reported a fatal
-/// failure or the timeout elapsed.
-///
-/// # Example
-///
-/// ```no_run
-/// use std::time::Duration;
-/// use wait_utils::{Probe, wait_until_ready_async};
-///
-/// # async fn example() {
-/// let ready = wait_until_ready_async(
-///     false,
-///     Duration::from_secs(60),
-///     Duration::from_millis(1),
-///     || async { Probe::Ready::<u32, String>(42) },
-/// )
-/// .await;
-///
-/// assert_eq!(ready.unwrap(), 42);
-/// # }
-/// ```
-pub async fn wait_until_ready_async<T, E, F, Fut>(
-    dbg: bool,
-    timeout: Duration,
-    retry_delay: Duration,
-    mut probe: F,
-) -> Result<T, WaitStrategyError>
-where
-    F: FnMut() -> Fut,
-    Fut: Future<Output = Probe<T, E>>,
-    E: Display,
-{
-    let start = Instant::now();
-    let mut attempt = 0u32;
-    let mut log = Repeats::new(dbg);
-
-    loop {
-        attempt = attempt.saturating_add(1);
-
-        // Declared per iteration: it is only ever read by the timeout check below, which is
-        // reachable only through the Retry arm that assigns it.
-        let last;
-
-        match probe().await {
-            Probe::Ready(value) => {
-                log.flush();
-                if dbg {
-                    println!("[wait_until_ready]: ready after {attempt} attempt(s)");
-                }
-                return Ok(value);
-            }
-            Probe::Fatal(err) => {
-                log.flush();
-                return Err(WaitStrategyError(format!(
-                    "[wait_until_ready]: attempt {attempt} failed unrecoverably: {err}"
-                )));
-            }
-            Probe::Retry(err) => {
-                last = err.to_string();
-                log.observe(attempt, &last);
-            }
-        }
-
-        // See the note in the synchronous variant on why this is not an absolute deadline.
-        if start.elapsed() >= timeout {
-            log.flush();
-            return Err(WaitStrategyError(format!(
-                "[wait_until_ready]: !!Timeout!! Waited {timeout:?} over {attempt} attempt(s). Last error: {last}"
-            )));
-        }
-
-        tokio::time::sleep(retry_delay).await;
     }
 }
 

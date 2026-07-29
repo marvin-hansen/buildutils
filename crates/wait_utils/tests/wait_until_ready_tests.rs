@@ -5,9 +5,8 @@
 
 //! Tests for the caller-supplied readiness probe. These run no command and need no Docker.
 
-use std::cell::Cell;
 use std::time::Duration;
-use wait_utils::{Probe, wait_until_ready, wait_until_ready_async};
+use wait_utils::{Probe, ProbeContext, WaitStrategy, wait_until_ready};
 
 const FAST: Duration = Duration::from_millis(1);
 
@@ -124,76 +123,66 @@ fn collapsing_repeated_messages_does_not_change_the_result() {
     assert_eq!(out.unwrap(), 5);
 }
 
-#[tokio::test]
-async fn async_returns_the_value_the_probe_built() {
-    let out = wait_until_ready_async(false, Duration::from_secs(5), FAST, || async {
-        Probe::Ready::<_, String>(42)
-    })
-    .await;
+/// The context is what removes the need for a probe to capture anything.
+#[test]
+fn a_probe_context_reports_what_the_driver_knows() {
+    let ctx = ProbeContext::new("redis-6379".to_string(), "127.0.0.1".to_string(), 6379, 3);
 
-    assert_eq!(out.unwrap(), 42);
+    assert_eq!(ctx.id(), "redis-6379");
+    assert_eq!(ctx.host(), "127.0.0.1");
+    assert_eq!(ctx.port(), 6379);
+    assert_eq!(ctx.attempt(), 3);
 }
 
-#[tokio::test]
-async fn async_retries_until_ready() {
-    // A Cell keeps the counter reachable from both the closure and the future it returns,
-    // which a plain mutable capture cannot do across an async block.
-    let attempts = Cell::new(0u32);
-
-    let out = wait_until_ready_async(false, Duration::from_secs(5), FAST, || {
-        attempts.set(attempts.get() + 1);
-        let seen = attempts.get();
-        async move {
-            if seen < 4 {
-                Probe::Retry("starting".to_string())
-            } else {
-                Probe::Ready(seen)
-            }
+/// A probe can escalate on its own after N attempts, without carrying state.
+#[test]
+fn a_probe_can_escalate_on_the_attempt_count() {
+    fn give_up_after_two(ctx: &ProbeContext) -> Probe<(), String> {
+        if ctx.attempt() >= 2 {
+            Probe::Fatal("tried twice, giving up".to_string())
+        } else {
+            Probe::Retry("not yet".to_string())
         }
-    })
-    .await;
+    }
 
-    assert_eq!(out.unwrap(), 4);
-    assert_eq!(attempts.get(), 4);
+    let mut attempt = 0u32;
+    let out = wait_until_ready::<(), _, _>(false, Duration::from_secs(30), FAST, || {
+        attempt += 1;
+        give_up_after_two(&ProbeContext::new(
+            "id".to_string(),
+            "host".to_string(),
+            1,
+            attempt,
+        ))
+    });
+
+    assert_eq!(attempt, 2, "it must stop on the attempt that escalated");
+    assert!(format!("{}", out.unwrap_err()).contains("giving up"));
 }
 
-#[tokio::test]
-async fn async_fatal_probe_stops_immediately() {
-    let attempts = Cell::new(0u32);
+/// A `fn` pointer keeps every derive `WaitStrategy` and its holders rely on.
+///
+/// This is the whole reason the probe is a function pointer rather than a boxed closure: a
+/// `Box<dyn Fn>` would strip `Clone`, `Eq`, `Ord` and `Hash` from `ContainerConfig` too.
+#[test]
+fn the_wait_until_ready_variant_keeps_the_derives() {
+    fn probe(_ctx: &ProbeContext) -> Probe<(), String> {
+        Probe::Ready(())
+    }
 
-    let out = wait_until_ready_async::<(), _, _, _>(false, Duration::from_secs(30), FAST, || {
-        attempts.set(attempts.get() + 1);
-        async { Probe::Fatal("container stopped") }
-    })
-    .await;
+    let strategy = WaitStrategy::WaitUntilReady {
+        probe,
+        timeout_secs: 30,
+        retry_delay_ms: 100,
+    };
 
-    assert_eq!(attempts.get(), 1, "a fatal probe must not be retried");
-    assert!(format!("{}", out.unwrap_err()).contains("container stopped"));
-}
+    let cloned = strategy.clone();
+    assert_eq!(strategy, cloned);
+    assert!(format!("{strategy:?}").contains("WaitUntilReady"));
+    assert!(strategy != WaitStrategy::NoWait);
 
-#[tokio::test]
-async fn async_timing_out_reports_the_last_error() {
-    let out =
-        wait_until_ready_async::<(), _, _, _>(false, Duration::from_millis(20), FAST, || async {
-            Probe::Retry("still starting")
-        })
-        .await;
-
-    let err = format!("{}", out.unwrap_err());
-    assert!(err.contains("Timeout"));
-    assert!(err.contains("still starting"));
-}
-
-#[tokio::test]
-async fn async_zero_timeout_still_runs_the_probe_once() {
-    let attempts = Cell::new(0u32);
-
-    let out = wait_until_ready_async(false, Duration::ZERO, FAST, || {
-        attempts.set(attempts.get() + 1);
-        let seen = attempts.get();
-        async move { Probe::Ready::<_, String>(seen) }
-    })
-    .await;
-
-    assert_eq!(out.unwrap(), 1);
+    use std::collections::HashSet;
+    let mut set = HashSet::new();
+    set.insert(strategy);
+    assert_eq!(set.len(), 1);
 }

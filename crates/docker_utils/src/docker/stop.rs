@@ -23,6 +23,17 @@ impl DockerUtil {
         let exists = self.check_if_container_is_running(container_id)?;
 
         if !exists {
+            // Already gone is the requested end state when deleting, and `--rm` guarantees it
+            // after a crash, so erroring here would mask the real failure with a teardown one.
+            // Without `delete` the caller asked to stop a specific container, so an absent one
+            // is still reported.
+            if delete {
+                self.dbg_print(&format!(
+                    "[stop_container]: Container {container_id} is already gone."
+                ));
+                return Ok(());
+            }
+
             return Err(DockerError::from(format!(
                 "Container doesn't exists: {container_id}"
             )));

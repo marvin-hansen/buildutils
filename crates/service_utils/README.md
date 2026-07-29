@@ -39,19 +39,56 @@ everything has been cleaned up after tests. While this can be done to some degre
 comprehensive solution that can be used to test a large number of services in a fast and efficient way without the need
 for complex configuration.
 
-Specifically, the service_util does not have a service stop or shutdown method because Bazel runs all tests in an
-isolated sandbox environment that shutdowns and cleans up automatically. In contrast, if you were to start a service
-with Cargo test, you would have to kill that process manually to prevent zombie processes on the CI server. The service
-util does not offer a way to copy binaries back and forth because Bazel already has a build in mechanism to do that. The
-service util is stateless as to facilitate massively parallel integration testing with Bazel Remote Build Execution (RBE) .
+The service util does not offer a way to copy binaries back and forth because Bazel already has a built in mechanism to
+do that. The service util is stateless as to facilitate massively parallel integration testing with Bazel Remote Build
+Execution (RBE).
 
 That said, the util can be used with Cargo,
 the [service util example demonstrates](../../examples/service_utils_example)
-this and documents the additional steps required.
+this and documents the additional steps required. See [Running under Cargo](#running-under-cargo-) below.
+
+## Starting and stopping 🔌
+
+`start_service` and `start_service_from_config` return the **process ID** of the service they
+started. Pass it to `stop_service` when you are done:
+
+```rust
+let pid = service_util.start_service_from_config(config).await?;
+// ... exercise the service ...
+service_util.stop_service(pid)?;
+```
+
+Under Bazel stopping is optional housekeeping: every test runs in a sandbox that takes the
+process down with it. Under Cargo there is no sandbox, so a service left running keeps holding
+its port, and the next run of the same test cannot bind. That is the one difference between the
+two, and `stop_service` is what closes it.
+
+Stopping a service that has already exited is not an error, so teardown never masks the failure
+that caused it. Note the process is stopped but not reaped: the crate drops the child handle on
+purpose so a service can outlive the call that started it, so the PID lingers as a zombie until
+your test binary exits. That is harmless, and the port is released either way.
+
+## Running under Cargo 🦀
+
+Bazel stages the service binary declaratively: the test target lists a `copy_file` in its
+`data`, and Bazel materialises it before the test runs. Cargo has no equivalent, and a build
+script cannot stand in for one because build scripts run before the workspace's other binaries
+are built and have no dependency edge to them.
+
+So the staging is done ahead of the run instead:
+
+```bash
+make test_cargo      # builds the binaries, copies them into place, then runs cargo test
+```
+
+This is a plain Cargo limitation rather than a defect in the crate: under Bazel, `make test`
+needs none of it.
 
 ## Features ✨
 
 - **Wait Strategies**: Flexible waiting mechanisms to ensure services are ready
+- **Readiness Probes**: Gate on your own operation succeeding, not on a proxy for it
+- **Lifecycle Control**: Start a service, get its PID back, stop it again
 - **Environment Control**: Configure service environment variables
 - **Error Handling**: Comprehensive error handling for service operations
 
@@ -61,7 +98,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-service_utils = "0.1.0"
+service_utils = "0.2"
 ```
 
 ### Basic Example
@@ -77,12 +114,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         vec!["service1", "service2"]
     ).await?;
 
-    // Start a service with a wait strategy
-    service_util.start_service(
+    // Start a service with a wait strategy. The PID comes back so it can be stopped again.
+    let pid = service_util.start_service(
         "service1",
-        WaitStrategy::WaitForSeconds(5),
+        None,
+        &WaitStrategy::WaitForDuration(5),
         None,
     ).await?;
+
+    service_util.stop_service(pid)?;
 
     Ok(())
 }
@@ -97,15 +137,32 @@ use service_utils::*;
 
     let config = ServiceStartConfig::builder()
         .program("service1")
-        .wait_strategy(WaitStrategy::WaitForSeconds(5))
-        .env_vars(vec!["DEBUG=1".into(), "ENV=CI".into()])
+        .wait_strategy(WaitStrategy::WaitForDuration(5))
+        .env_vars(vec![("DEBUG".into(), "1".into())])
         .build();
 
-    service_util.start_service_from_config(config).await?;
-
-    Ok(())
-}
+    let pid = service_util.start_service_from_config(config).await?;
 ```
+
+The config also carries the address a caller would connect to, which is what a readiness probe
+is handed:
+
+```rust
+    let config = ServiceStartConfig::builder()
+        .program("service1")
+        .host("127.0.0.1")     // defaults to "localhost"
+        .port(8080)            // required only by WaitUntilReady
+        .wait_strategy(WaitStrategy::WaitUntilReady {
+            probe: my_service_is_ready,
+            timeout_secs: 60,
+            retry_delay_ms: 250,
+        })
+        .build();
+```
+
+The address lives in the config because it is a chicken and egg problem: the caller cannot
+connect until it knows the port, and the driver cannot start the service until the caller has
+chosen one. The config is what breaks it, by being the single place both sides read.
 
 ## Bazel Test configuration
 
@@ -160,9 +217,41 @@ copy_file(
 
 The crate provides several wait strategies through the `wait_utils` dependency:
 
+- `NoWait`: Return as soon as the service is started.
 - `WaitForDuration(u64)`: Wait for a specified number of seconds
 - `WaitForHttpHealthCheck(String, u64)`: Wait until an HTTP request to the given URL or until a timeout occurs.
-- `WaitForGrpcHealthCheck(u16, u64)`: Wait until an gRPC health request to the given URL or until a timeout occurs.
+- `WaitForGrpcHealthCheck(String, u64)`: Wait until an gRPC health request to the given URL or until a timeout occurs.
+- `WaitUntilReady { probe, timeout_secs, retry_delay_ms }`: Wait until your own probe reports ready.
+
+`WaitUntilConsoleOutputContains` is not honoured here: it reads container logs, and this crate
+starts local binaries rather than containers. It is reported as an unsupported strategy rather
+than silently waiting.
+
+### Readiness probes
+
+Every other strategy is a fixed predicate this crate implements. None of them can express "the
+operation I am about to perform succeeds", which is the only predicate that is never wrong: a
+service commonly accepts connections seconds before it accepts real work. A probe closes that
+gap:
+
+```rust
+use service_utils::{Probe, ProbeContext};
+
+fn my_service_is_ready(ctx: &ProbeContext) -> Probe<(), String> {
+    match TcpStream::connect((ctx.host(), ctx.port())) {
+        Ok(_) => Probe::Ready(()),
+        Err(e) => Probe::Retry(format!("attempt {}: {e}", ctx.attempt())),
+    }
+}
+```
+
+The outcome is three-way on purpose. `Probe::Fatal` stops the wait at once, so a permanent
+failure is reported as itself rather than retried into a timeout that describes the symptom
+instead of the cause.
+
+A probe is a plain `fn` pointer, so it cannot capture state; the address it needs comes from
+the `ProbeContext`. It is synchronous by contract and runs on a thread of its own, so it may
+build its own async runtime even when your test is already inside one.
 
 ## Error Handling 🚨
 
@@ -170,7 +259,9 @@ The crate uses a dedicated `ServiceUtilError` type that covers various failure s
 
 - Binary not found
 - Service start failure
-- Wait strategy timeout
+- Service stop failure
+- Wait strategy timeout, carrying the probe's own last message
+- Unsupported wait strategy for this driver
 - Environment configuration errors
 
 ## Debug Mode 🔍
