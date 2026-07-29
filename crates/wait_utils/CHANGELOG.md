@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0](https://github.com/marvin-hansen/buildutils/compare/wait_utils-v0.1.7...wait_utils-v0.2.0) - 2026-07-29
+
+### Added
+
+- honour a caller-supplied readiness probe in both drivers
+
+### Other
+
+- Merge remote-tracking branch 'origin/main'
+
 ## [0.1.7](https://github.com/marvin-hansen/buildutils/compare/wait_utils-v0.1.6...wait_utils-v0.1.7) - 2026-07-29
 
 ### Added
