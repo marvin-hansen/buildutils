@@ -11,6 +11,7 @@ mod build;
 mod check_running;
 mod dbg;
 mod default;
+mod diagnostics;
 mod prune;
 mod pull;
 mod utils;

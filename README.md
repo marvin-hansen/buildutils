@@ -22,7 +22,7 @@ Check out the [docker_utils documentation](crates/docker_utils/README.md) for de
 ### 🔧 Service Utils
 
 A lightweight Rust crate for testing service binaries efficiently. With service_utils, you can:
-- Start service binaries for easyintegration testing
+- Start service binaries for easy integration testing
 - Use flexible wait strategies to ensure services are ready
 - Configure environment variables for testing different scenarios
 

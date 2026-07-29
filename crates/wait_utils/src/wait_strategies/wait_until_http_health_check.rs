@@ -4,7 +4,7 @@
  */
 
 use crate::WaitStrategyError;
-use crate::utils_test::build_curl_args;
+use crate::utils::utils_test::build_curl_args;
 use std::process::Command;
 use std::time::Duration;
 use tokio::time::Instant;

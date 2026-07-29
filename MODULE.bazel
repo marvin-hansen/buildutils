@@ -11,6 +11,7 @@ bazel_dep(name = "rules_rust", version = "0.72.0")
 # Rust toolchain https://github.com/bazelbuild/rules_rust/releases
 ###############################################################################
 RUST_EDITION = "2024"
+
 RUST_VERSION = "1.97.1"
 
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")

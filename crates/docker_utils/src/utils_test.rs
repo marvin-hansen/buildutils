@@ -8,7 +8,7 @@
 //! They are public so that the test suite under `tests/` can exercise them directly. Each
 //! one is a plain function over its inputs and runs no Docker command of its own.
 
-use crate::DockerError;
+use crate::{ContainerDiagnostics, DockerError};
 
 /// Builds the full argument list for `docker run`.
 ///
@@ -141,4 +141,59 @@ pub fn image_tag(image: &str) -> Option<&str> {
     }
 
     Some(&image[last_colon + 1..])
+}
+
+/// Field order requested from `docker inspect`.
+///
+/// Kept next to [`parse_inspect_line`] so the two cannot drift apart. Note that
+/// `RestartCount` is a top level field while the rest live under `State`.
+pub const INSPECT_FORMAT: &str = concat!(
+    "{{.State.Status}}\t{{.State.Running}}\t{{.RestartCount}}\t",
+    "{{.State.OOMKilled}}\t{{.State.ExitCode}}\t{{.State.StartedAt}}\t{{.State.FinishedAt}}"
+);
+
+/// Parse one tab separated `docker inspect` line produced with [`INSPECT_FORMAT`].
+///
+/// Missing or unparseable numeric fields fall back to a neutral value rather than failing the
+/// whole call: a partial post-mortem is still worth having, and this runs on a path where
+/// something has already gone wrong.
+///
+/// # Arguments
+///
+/// * `line` - The output of `docker inspect --format`, with or without a trailing newline.
+/// * `logs` - The captured log tail, if it could be read.
+///
+/// # Returns
+///
+/// Returns the parsed diagnostics, or a `DockerError` if the line is not in the expected
+/// shape.
+///
+pub fn parse_inspect_line(
+    line: &str,
+    logs: Option<String>,
+) -> Result<ContainerDiagnostics, DockerError> {
+    // Only the line ends are trimmed. Trimming every field would be wrong: Status is the
+    // first field and a stray leading space there is a signal, not noise.
+    let fields: Vec<&str> = line
+        .trim_matches(|c| c == '\n' || c == '\r')
+        .split('\t')
+        .collect();
+
+    if fields.len() < 7 {
+        return Err(DockerError::from(format!(
+            "unexpected docker inspect output, wanted 7 tab-separated fields, got {}: {line:?}",
+            fields.len()
+        )));
+    }
+
+    Ok(ContainerDiagnostics::new(
+        fields[0].to_string(),
+        fields[1] == "true",
+        fields[2].parse().unwrap_or(0),
+        fields[3] == "true",
+        fields[4].parse().unwrap_or(0),
+        fields[5].to_string(),
+        fields[6].to_string(),
+        logs,
+    ))
 }

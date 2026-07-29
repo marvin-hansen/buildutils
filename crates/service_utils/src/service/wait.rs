@@ -26,7 +26,11 @@ impl ServiceUtil {
                 self.dbg_print(&format!(
                     "[start_container]: Waiting for {duration} seconds."
                 ));
-                wait_utils::wait_until_timeout(duration).expect("Failed to wait for duration");
+                wait_utils::wait_until_timeout(duration).map_err(|e| {
+                    ServiceUtilError::ServiceHealthcheckFailed(format!(
+                        "could not wait for {duration} seconds: {e}"
+                    ))
+                })?;
             }
 
             WaitStrategy::WaitUntilConsoleOutputContains(_, _) => {
@@ -40,8 +44,11 @@ impl ServiceUtil {
                     "[start_container]: Waiting for {:?} on HTTP health check on {}.",
                     duration, url
                 ));
-                wait_utils::wait_until_http_health_check(self.dbg, url, duration)
-                    .expect("Failed to wait for HTTP health check");
+                wait_utils::wait_until_http_health_check(self.dbg, url, duration).map_err(|e| {
+                    ServiceUtilError::ServiceHealthcheckFailed(format!(
+                        "service did not pass its HTTP health check on {url}: {e}"
+                    ))
+                })?;
             }
 
             WaitStrategy::WaitForGrpcHealthCheck(url, duration) => {
@@ -51,7 +58,11 @@ impl ServiceUtil {
                 ));
                 wait_utils::wait_until_grpc_health_check(self.dbg, url, duration)
                     .await
-                    .expect("Failed to wait for HTTP health check");
+                    .map_err(|e| {
+                        ServiceUtilError::ServiceHealthcheckFailed(format!(
+                            "service did not pass its gRPC health check on {url}: {e}"
+                        ))
+                    })?;
             }
 
             // Do nothing

@@ -242,7 +242,11 @@ impl DockerUtil {
                 self.dbg_print(&format!(
                     "[start_container]: Waiting for {duration} seconds."
                 ));
-                wait_utils::wait_until_timeout(duration).expect("Failed to wait for duration");
+                wait_utils::wait_until_timeout(duration).map_err(|e| {
+                    DockerError::from(format!(
+                        "container '{container_id}' could not be waited for: {e}"
+                    ))
+                })?;
                 Ok(())
             }
 
@@ -256,7 +260,11 @@ impl DockerUtil {
                     expected_output,
                     timeout,
                 )
-                .expect("Failed to wait until console output contains");
+                .map_err(|e| {
+                    DockerError::from(format!(
+                        "container '{container_id}' never logged '{expected_output}': {e}"
+                    ))
+                })?;
 
                 Ok(())
             }
@@ -266,8 +274,11 @@ impl DockerUtil {
                     "[start_container]: Waiting for {:?} on HTTP health check on {}.",
                     duration, url
                 ));
-                wait_utils::wait_until_http_health_check(self.dbg, url, duration)
-                    .expect("Failed to wait for HTTP health check");
+                wait_utils::wait_until_http_health_check(self.dbg, url, duration).map_err(|e| {
+                    DockerError::from(format!(
+                        "container '{container_id}' did not pass its HTTP health check: {e}"
+                    ))
+                })?;
 
                 Ok(())
             }

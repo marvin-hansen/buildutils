@@ -3,7 +3,7 @@
  * Copyright (c) "2025" . The buildutils Authors and Contributors. All Rights Reserved.
  */
 
-use crate::{ContainerConfig, DockerError, DockerUtil};
+use crate::{ContainerConfig, ContainerDiagnostics, DockerError, DockerUtil};
 
 impl DockerUtil {
     /// Create a new instance of the `DockerUtil` struct.
@@ -111,14 +111,6 @@ impl DockerUtil {
     /// * Container start operation fails
     /// * Port mapping operation fails
     /// * Docker API communication fails
-    ///
-    /// # Panics
-    ///
-    /// This function will panic if:
-    /// * Container existence check critically fails
-    /// * Tag verification critically fails
-    /// * Container stop operation critically fails
-    /// * Container setup critically fails
     ///
     /// # Implementation Notes
     ///
@@ -329,5 +321,52 @@ impl DockerUtil {
     pub fn prune_all_containers(&mut self) -> Result<(), DockerError> {
         // see src/docker/prune.rs
         self.prune()
+    }
+
+    /// Collect a container's exit state and log tail, for explaining a failure.
+    ///
+    /// Call this as soon as a failure is detected. Containers started by this crate carry
+    /// `--rm`, so Docker deletes them the moment they exit, and once a container is gone the
+    /// exit code goes with it: the difference between "OOM-killed" and "unexplained
+    /// connection error" is only observable while the container still exists. Once it has
+    /// been removed this returns an `Err` rather than a partial answer.
+    ///
+    /// # Arguments
+    ///
+    /// * `container_id` - The ID of the container to inspect.
+    /// * `log_tail` - How many trailing log lines to capture. Zero captures none.
+    ///
+    /// # Returns
+    ///
+    /// Returns the diagnostics, or a `DockerError` if the container could not be inspected.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use docker_utils::DockerUtil;
+    ///
+    /// fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let docker = DockerUtil::new()?;
+    ///
+    ///     let diag = docker.container_diagnostics("redis-6379", 200)?;
+    ///     if diag.looks_oom_killed() {
+    ///         println!("container ran out of memory:\n{diag}");
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DockerError` if `docker inspect` cannot be run or reports failure, or if
+    /// its output is not in the expected shape.
+    ///
+    pub fn container_diagnostics(
+        &self,
+        container_id: &str,
+        log_tail: usize,
+    ) -> Result<ContainerDiagnostics, DockerError> {
+        // see src/docker/diagnostics.rs
+        self.diagnostics(container_id, log_tail)
     }
 }

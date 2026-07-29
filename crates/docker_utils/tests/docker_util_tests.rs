@@ -146,11 +146,11 @@ async fn test_start_container_reports_docker_run_failure() {
     let contender = get_conflict_container_config(CONFLICT_CONTENDER);
     let res = docker_util.get_or_start_container(&contender);
 
-    // Clean up before asserting so that a failed assertion does not leak the container.
-    let occupant_id = format!("{CONFLICT_OCCUPANT}-{CONFLICT_PORT}");
-    docker_util
-        .stop_container(&occupant_id, true)
-        .expect("Failed to stop the first container");
+    // Clean up both before asserting, so that a failed assertion cannot leak a container.
+    // The contender is removed too: if it ever does acquire the port it would hold it for
+    // good and break every later run of this test.
+    remove_bare_container(&format!("{CONFLICT_CONTENDER}-{CONFLICT_PORT}"));
+    remove_bare_container(&format!("{CONFLICT_OCCUPANT}-{CONFLICT_PORT}"));
 
     let err = res.expect_err("Starting a container on an occupied port must fail");
     let msg = err.to_string();
@@ -247,4 +247,48 @@ async fn test_stop_container_that_is_not_running() {
     let res = docker_util.stop_container("docker-utils-never-started-1234", true);
 
     assert!(res.is_err(), "Stopping an absent container must fail");
+}
+
+/// A wait strategy that times out must be reported, not panicked on.
+///
+/// `setup_container` and `get_or_start_container` return a `Result`, so a caller has every
+/// reason to expect a timeout to arrive as an `Err`. Aborting the process instead destroys
+/// the evidence: it happens before the caller can collect the container's diagnostics, which
+/// is the worst possible moment to panic. This test fails if either the wait or the setup
+/// path goes back to `.expect()`, because a panic is a test failure.
+#[tokio::test]
+async fn test_a_failing_wait_strategy_is_reported_rather_than_panicking() {
+    let docker_util = DockerUtil::new().expect("Failed to create DockerUtil");
+    let name = "docker-utils-waitfail";
+    let port = 6398;
+    let container_id = format!("{name}-{port}");
+
+    // Redis serves no HTTP, so this health check can only time out.
+    let container_config = ContainerConfig::builder()
+        .name(name)
+        .image("redis")
+        .tag("7-alpine")
+        .url("0.0.0.0")
+        .connection_port(port)
+        .reuse_container(false)
+        .keep_configuration(false)
+        .wait_strategy(WaitStrategy::WaitForHttpHealthCheck(
+            format!("http://127.0.0.1:{port}/health"),
+            2,
+        ))
+        .build();
+
+    let res = docker_util.setup_container(&container_config);
+
+    remove_bare_container(&container_id);
+
+    let err = res.expect_err("a health check that never passes must be reported");
+    assert!(
+        err.to_string().contains("HTTP health check"),
+        "the error must name the failing wait, got: {err}"
+    );
+    assert!(
+        err.to_string().contains(&container_id),
+        "the error must name the container, got: {err}"
+    );
 }

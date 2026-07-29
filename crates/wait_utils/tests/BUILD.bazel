@@ -18,7 +18,7 @@ rust_test_suite(
         "test.runner-recycling-key": "wait_utils_integration_test",
     },
     tags = [
-        "integration_test",
+        "integration-test",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -31,6 +31,7 @@ rust_test_suite(
     name = "unit_tests",
     srcs = glob([
         "utils_tests.rs",
+        "wait_until_ready_tests.rs",
     ]),
     tags = [
         "unit-test",
@@ -39,5 +40,7 @@ rust_test_suite(
     deps = [
         # Crate to test
         "//alias:wait_utils",
+        # External crates
+        "//thirdparty/crates:tokio",
     ],
 )

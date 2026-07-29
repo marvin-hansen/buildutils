@@ -4,6 +4,7 @@ rust_test_suite(
     name = "integration_tests",
     srcs = glob([
         "container_args_tests.rs",
+        "diagnostics_e2e_tests.rs",
         "docker_util_tests.rs",
         "host_network_tests.rs",
     ]),
@@ -19,7 +20,7 @@ rust_test_suite(
         "test.runner-recycling-key": "docker_utils_integration_test",
     },
     tags = [
-        "integration_test",
+        "integration-test",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -36,6 +37,7 @@ rust_test_suite(
     name = "unit_tests",
     srcs = glob([
         "container_config_tests.rs",
+        "container_diagnostics_tests.rs",
         "utils_tests.rs",
     ]),
     tags = [
