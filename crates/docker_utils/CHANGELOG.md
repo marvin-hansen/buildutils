@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.4](https://github.com/marvin-hansen/buildutils/compare/docker_utils-v0.3.3...docker_utils-v0.3.4) - 2026-08-20
+
+### Added
+
+- *(docker_utils)* mount volumes into a container
+
 ## [0.3.3](https://github.com/marvin-hansen/buildutils/compare/docker_utils-v0.3.2...docker_utils-v0.3.3) - 2026-07-29
 
 ### Added
