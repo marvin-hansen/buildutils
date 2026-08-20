@@ -15,13 +15,13 @@ const IMAGE: &str = "test_image:latest";
 
 /// Builds args for a container publishing ports, with everything else unset.
 fn published_args() -> Vec<String> {
-    build_run_args(CONTAINER_ID, 8080, None, None, None, IMAGE, false)
+    build_run_args(CONTAINER_ID, 8080, None, None, None, None, IMAGE, false)
         .expect("Failed to build run args")
 }
 
 /// Builds args for the same container on the host network.
 fn host_network_args() -> Vec<String> {
-    build_run_args(CONTAINER_ID, 8080, None, None, None, IMAGE, true)
+    build_run_args(CONTAINER_ID, 8080, None, None, None, None, IMAGE, true)
         .expect("Failed to build run args")
 }
 
@@ -67,6 +67,7 @@ fn test_build_run_args_publishes_additional_ports() {
         Some(&[8081, 8082]),
         None,
         None,
+        None,
         IMAGE,
         false,
     )
@@ -91,6 +92,7 @@ fn test_build_run_args_sets_platform() {
         8080,
         None,
         Some("linux/amd64"),
+        None,
         None,
         IMAGE,
         false,
@@ -117,6 +119,7 @@ fn test_build_run_args_gives_each_env_var_its_own_flag() {
         None,
         None,
         Some(&["ENV_VAR=VALUE", "DEBUG=true"]),
+        None,
         IMAGE,
         false,
     )
@@ -155,6 +158,7 @@ fn test_build_run_args_host_network_skips_additional_ports() {
         Some(&[8081, 8082]),
         None,
         None,
+        None,
         IMAGE,
         true,
     )
@@ -175,6 +179,7 @@ fn test_build_run_args_host_network_keeps_other_arguments() {
         None,
         Some("linux/arm64"),
         Some(&["DEBUG=true"]),
+        None,
         IMAGE,
         true,
     )
@@ -191,7 +196,16 @@ fn test_build_run_args_host_network_keeps_other_arguments() {
 
 #[test]
 fn test_build_run_args_rejects_zero_port() {
-    let res = build_run_args(CONTAINER_ID, 8080, Some(&[0]), None, None, IMAGE, false);
+    let res = build_run_args(
+        CONTAINER_ID,
+        8080,
+        Some(&[0]),
+        None,
+        None,
+        None,
+        IMAGE,
+        false,
+    );
 
     assert!(res.is_err());
     assert!(res.unwrap_err().to_string().contains("Port cannot be 0"));
@@ -200,7 +214,16 @@ fn test_build_run_args_rejects_zero_port() {
 #[test]
 fn test_build_run_args_rejects_zero_port_on_host_network() {
     // Validation must not be skipped just because ports are not published.
-    let res = build_run_args(CONTAINER_ID, 8080, Some(&[0]), None, None, IMAGE, true);
+    let res = build_run_args(
+        CONTAINER_ID,
+        8080,
+        Some(&[0]),
+        None,
+        None,
+        None,
+        IMAGE,
+        true,
+    );
 
     assert!(res.is_err());
     assert!(res.unwrap_err().to_string().contains("Port cannot be 0"));
@@ -281,4 +304,74 @@ fn test_image_tag_ignores_registry_port() {
 #[test]
 fn test_image_tag_of_untagged_image() {
     assert_eq!(image_tag("nginx"), None);
+}
+
+/// Every volume specification has to reach Docker on its own flag.
+///
+/// Docker reads a single value per `-v`, exactly as it does for `-e`, so sharing one flag
+/// across mounts would turn the second into the image name.
+#[test]
+fn test_build_run_args_emits_one_flag_per_volume() {
+    let args = build_run_args(
+        CONTAINER_ID,
+        8080,
+        None,
+        None,
+        None,
+        Some(&["/host/a:/c/a:ro", "/host/b:/c/b"]),
+        IMAGE,
+        false,
+    )
+    .expect("Failed to build run args");
+
+    assert_eq!(
+        values_after(&args, "-v"),
+        vec!["/host/a:/c/a:ro", "/host/b:/c/b"]
+    );
+    // The image stays the final argument, which is what a shared flag would have broken.
+    assert_eq!(args.last().unwrap(), IMAGE);
+}
+
+/// The specification is passed through, not parsed: Docker's `-v` syntax carries named
+/// volumes, `:z`, and anonymous mounts, and re-implementing it here would reject input the
+/// daemon accepts.
+#[test]
+fn test_build_run_args_does_not_parse_the_volume_specification() {
+    let args = build_run_args(
+        CONTAINER_ID,
+        8080,
+        None,
+        None,
+        None,
+        Some(&["named-volume:/data", "/host/c:/c/c:z"]),
+        IMAGE,
+        false,
+    )
+    .expect("Failed to build run args");
+
+    assert_eq!(
+        values_after(&args, "-v"),
+        vec!["named-volume:/data", "/host/c:/c/c:z"]
+    );
+}
+
+/// An empty specification is the one case worth rejecting: Docker reports it as an
+/// "invalid mount config" that names nothing the caller wrote.
+#[test]
+fn test_build_run_args_rejects_an_empty_volume() {
+    for empty in ["", "   "] {
+        let res = build_run_args(
+            CONTAINER_ID,
+            8080,
+            None,
+            None,
+            None,
+            Some(&[empty]),
+            IMAGE,
+            false,
+        );
+
+        assert!(res.is_err(), "empty specification {empty:?} was accepted");
+        assert!(res.unwrap_err().to_string().contains(CONTAINER_ID));
+    }
 }

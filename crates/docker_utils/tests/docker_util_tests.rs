@@ -16,6 +16,7 @@ fn get_test_container_config() -> ContainerConfig<'static> {
         None,
         None,
         None,
+        None,
         false, // Publish ports rather than using the host network
         true,  // Keep the container running for re-use
         true,  // Keep the same container config across all env. setups.
@@ -119,6 +120,7 @@ fn get_conflict_container_config(name: &'static str) -> ContainerConfig<'static>
         "1.27.0",
         "0.0.0.0",
         CONFLICT_PORT,
+        None,
         None,
         None,
         None,

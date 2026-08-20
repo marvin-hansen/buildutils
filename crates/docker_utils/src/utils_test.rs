@@ -30,12 +30,14 @@ use crate::{ContainerDiagnostics, DockerError};
 ///
 /// Returns the argument list if successful, or a `DockerError` if a port is invalid.
 ///
+#[allow(clippy::too_many_arguments)]
 pub fn build_run_args(
     container_id: &str,
     connection_port: u16,
     additional_ports: Option<&[u16]>,
     platform: Option<&str>,
     additional_env_vars: Option<&[&str]>,
+    volumes: Option<&[&str]>,
     image: &str,
     host_network: bool,
 ) -> Result<Vec<String>, DockerError> {
@@ -91,6 +93,27 @@ pub fn build_run_args(
         for env_var in add_args {
             args.push("-e".to_string());
             args.push((*env_var).to_string());
+        }
+    }
+
+    // Bind mounts. Docker takes one specification per -v flag, for the same reason -e does:
+    // anything after the first would be read as the image name.
+    //
+    // The specification is passed through rather than parsed. Docker's -v syntax carries
+    // more than host:container -- :ro, :z, named volumes, anonymous volumes -- and
+    // re-implementing that here would reject valid input the daemon accepts. An empty
+    // string is rejected, because that is the one case Docker reports as an unhelpful
+    // "invalid mount config" with nothing naming the caller.
+    if let Some(volumes) = volumes {
+        for volume in volumes {
+            if volume.trim().is_empty() {
+                return Err(DockerError::from(format!(
+                    "Error starting container {container_id}: volume specification cannot be empty.",
+                )));
+            }
+
+            args.push("-v".to_string());
+            args.push((*volume).to_string());
         }
     }
 

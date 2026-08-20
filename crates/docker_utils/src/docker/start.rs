@@ -44,6 +44,7 @@ impl DockerUtil {
         let additional_ports = container_config.additional_ports();
         let platform = container_config.platform();
         let additional_env_vars = container_config.additional_env_vars();
+        let volumes = container_config.volumes();
         let host = container_config.url();
         let reuse_container = container_config.reuse_container();
         let host_network = container_config.host_network();
@@ -110,6 +111,7 @@ impl DockerUtil {
             additional_ports,
             platform,
             additional_env_vars,
+            volumes,
             image,
             host,
             host_network,
@@ -129,6 +131,7 @@ impl DockerUtil {
     /// * `additional_ports` - An optional array of additional ports to publish.
     /// * `platform` - An optional platform string in case the container image is not multi-arch.
     /// * `additional_env_vars` - An optional array of additional environment variables to set.
+    /// * `volumes` - Optional bind mounts, each in Docker's `-v` form: `host:container[:ro]`.
     /// * `image` - The image to use for the container.
     /// * `host` - The host a caller would connect to, handed to a readiness probe.
     /// * `host_network` - Run the container on the host network instead of publishing ports.
@@ -147,6 +150,7 @@ impl DockerUtil {
         additional_ports: Option<&[u16]>,
         platform: Option<&str>,
         additional_env_vars: Option<&[&str]>,
+        volumes: Option<&[&str]>,
         image: &str,
         host: &str,
         host_network: bool,
@@ -163,6 +167,7 @@ impl DockerUtil {
             additional_ports,
             platform,
             additional_env_vars,
+            volumes,
             image,
             host_network,
         )?;

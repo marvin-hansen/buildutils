@@ -10,4 +10,5 @@ mod diagnostics_e2e_tests;
 mod docker_util_tests;
 mod host_network_tests;
 mod utils_tests;
+mod volume_mount_tests;
 mod wait_until_ready_tests;

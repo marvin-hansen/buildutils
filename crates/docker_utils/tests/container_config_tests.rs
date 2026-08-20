@@ -15,6 +15,7 @@ fn sample_container_config() -> ContainerConfig<'static> {
         8080,
         Some(&[8081, 8082]),
         Some(&["ENV_VAR=VALUE", "DEBUG=true"]),
+        Some(&["/tmp/host:/tmp/container:ro"]),
         Some("linux/amd64"),
         false, // Publish ports rather than using the host network
         true,

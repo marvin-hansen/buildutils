@@ -28,6 +28,23 @@ use bon::Builder;
 ///         .build();
 /// ```
 ///
+/// Mounting a file into the container, for a program that takes a path rather than a value:
+/// ```rust
+///  use docker_utils::*;
+///
+///     let config = ContainerConfig::builder()
+///         .name("test_container")
+///         .image("test_image")
+///         .tag("latest")
+///         .url("0.0.0.0")
+///         .connection_port(8080)
+///         .reuse_container(true)
+///         .keep_configuration(true)
+///         .volumes(&["/host/secrets:/run/secrets:ro"])
+///         .wait_strategy(WaitStrategy::NoWait)
+///         .build();
+/// ```
+///
 /// Creating a configuration that runs the container on the host network:
 /// ```rust
 ///  use docker_utils::*;
@@ -56,6 +73,13 @@ pub struct ContainerConfig<'l> {
     keep_configuration: bool,
     additional_ports: Option<&'l [u16]>,
     additional_env_vars: Option<&'l [&'l str]>,
+    /// Bind mounts, each in Docker's `-v` form: `host:container[:ro]`.
+    ///
+    /// The reason this exists rather than callers baking files into an image: some programs
+    /// take a path, not a value. Dgraph's `--acl "secret-file=<path>"` is the case that
+    /// prompted it -- there is no inline form, so a secret can only reach the container as a
+    /// file, and putting it in an image would commit it to a layer.
+    volumes: Option<&'l [&'l str]>,
     platform: Option<&'l str>,
     /// Run the container on the host network instead of publishing ports.
     ///
@@ -77,6 +101,7 @@ impl<'l> ContainerConfig<'l> {
     /// * `url` - The default URL of the container. Usually 0.0.0.0
     /// * `connection_port` - The port number for the main connection i.e. 80 for a webserver.
     /// * `additional_ports` - An optional array of additional ports to publish.
+    /// * `volumes` - Optional bind mounts, each in Docker's `-v` form: `host:container[:ro]`.
     /// * `platform` - An optional platform string in case the container image is not multi-arch.
     /// * `host_network` - Run the container on the host network instead of publishing ports.
     ///   When true, no port is published because Docker discards published ports in host
@@ -101,6 +126,7 @@ impl<'l> ContainerConfig<'l> {
     ///         8080,
     ///         Some(&[8081, 8082]),
     ///         Some(&["ENV_VAR=VALUE", "DEBUG=true"]),
+    ///         Some(&["/etc/secrets:/run/secrets:ro"]),
     ///         Some("linux/amd64"),
     ///         false, // Publish ports rather than using the host network
     ///         true,
@@ -122,6 +148,7 @@ impl<'l> ContainerConfig<'l> {
         connection_port: u16,
         additional_ports: Option<&'l [u16]>,
         additional_env_vars: Option<&'l [&'l str]>,
+        volumes: Option<&'l [&'l str]>,
         platform: Option<&'l str>,
         host_network: bool,
         reuse_container: bool,
@@ -138,6 +165,7 @@ impl<'l> ContainerConfig<'l> {
             keep_configuration,
             additional_ports,
             additional_env_vars,
+            volumes,
             platform,
             host_network,
             wait_strategy,
@@ -173,6 +201,11 @@ impl<'l> ContainerConfig<'l> {
     #[inline]
     pub const fn additional_env_vars(&self) -> Option<&'l [&'l str]> {
         self.additional_env_vars
+    }
+    /// Bind mounts, each in Docker's `-v` form: `host:container[:ro]`.
+    #[inline]
+    pub const fn volumes(&self) -> Option<&'l [&'l str]> {
+        self.volumes
     }
     #[inline]
     pub const fn platform(&self) -> Option<&'l str> {

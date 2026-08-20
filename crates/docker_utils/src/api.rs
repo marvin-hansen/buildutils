@@ -87,6 +87,7 @@ impl DockerUtil {
     ///         None,
     ///         Some(&["POSTGRES_PASSWORD=secret"]),
     ///         None,
+    ///         None,
     ///         false, // Publish ports rather than using the host network
     ///         true,
     ///         false,
@@ -154,6 +155,7 @@ impl DockerUtil {
     ///         "latest",
     ///         "0.0.0.0",
     ///         6379,
+    ///         None,
     ///         None,
     ///         None,
     ///         None,
