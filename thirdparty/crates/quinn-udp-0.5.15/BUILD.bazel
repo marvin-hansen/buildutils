@@ -112,8 +112,8 @@ rust_library(
     }),
     version = "0.5.15",
     deps = [
+        ":build_script_build",
         "//thirdparty/crates/libc-0.2.189:libc",
-        "//thirdparty/crates/quinn-udp-0.5.15:build_script_build",
     ] + select({
         "@rules_rust//rust/platform:aarch64-apple-darwin": [
             "//thirdparty/crates/socket2-0.6.5:socket2",  # cfg(not(all(target_family = "wasm", target_os = "unknown")))

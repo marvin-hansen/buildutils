@@ -112,7 +112,7 @@ rust_library(
     }),
     version = "0.52.6",
     deps = [
-        "//thirdparty/crates/windows_x86_64_gnu-0.52.6:build_script_build",
+        ":build_script_build",
     ],
 )
 

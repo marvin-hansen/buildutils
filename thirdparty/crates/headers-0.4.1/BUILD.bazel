@@ -111,7 +111,7 @@ rust_library(
         "//thirdparty/crates/base64-0.22.1:base64",
         "//thirdparty/crates/bytes-1.12.1:bytes",
         "//thirdparty/crates/headers-core-0.3.0:headers_core",
-        "//thirdparty/crates/http-1.4.2:http",
+        "//thirdparty/crates/http-1.5.0:http",
         "//thirdparty/crates/httpdate-1.0.3:httpdate",
         "//thirdparty/crates/mime-0.3.17:mime",
         "//thirdparty/crates/sha1-0.10.7:sha1",

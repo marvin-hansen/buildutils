@@ -115,13 +115,13 @@ rust_library(
     }),
     version = "0.22.4",
     deps = [
+        ":build_script_build",
         "//thirdparty/crates/cfg-if-1.0.4:cfg_if",
         "//thirdparty/crates/combine-4.6.7:combine",
-        "//thirdparty/crates/jni-0.22.4:build_script_build",
         "//thirdparty/crates/jni-sys-0.4.1:jni_sys",
         "//thirdparty/crates/log-0.4.33:log",
         "//thirdparty/crates/simd_cesu8-1.2.0:simd_cesu8",
-        "//thirdparty/crates/thiserror-2.0.19:thiserror",
+        "//thirdparty/crates/thiserror-2.0.20:thiserror",
     ] + select({
         "@rules_rust//rust/platform:aarch64-pc-windows-msvc": [
             "//thirdparty/crates/windows-link-0.2.1:windows_link",  # cfg(windows)

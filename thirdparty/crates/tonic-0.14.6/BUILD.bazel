@@ -45,7 +45,7 @@ rust_library(
     crate_root = "src/lib.rs",
     edition = "2024",
     proc_macro_deps = [
-        "//thirdparty/crates/async-trait-0.1.91:async_trait",
+        "//thirdparty/crates/async-trait-0.1.92:async_trait",
     ],
     rustc_env_files = [
         ":cargo_toml_env_vars",
@@ -122,10 +122,10 @@ rust_library(
         "//thirdparty/crates/axum-0.8.9:axum",
         "//thirdparty/crates/base64-0.22.1:base64",
         "//thirdparty/crates/bytes-1.12.1:bytes",
-        "//thirdparty/crates/h2-0.4.15:h2",
-        "//thirdparty/crates/http-1.4.2:http",
+        "//thirdparty/crates/h2-0.4.17:h2",
+        "//thirdparty/crates/http-1.5.0:http",
         "//thirdparty/crates/http-body-1.1.0:http_body",
-        "//thirdparty/crates/http-body-util-0.1.4:http_body_util",
+        "//thirdparty/crates/http-body-util-0.1.5:http_body_util",
         "//thirdparty/crates/hyper-1.11.0:hyper",
         "//thirdparty/crates/hyper-timeout-0.5.2:hyper_timeout",
         "//thirdparty/crates/hyper-util-0.1.20:hyper_util",

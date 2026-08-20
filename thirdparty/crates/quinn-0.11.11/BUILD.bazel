@@ -27,7 +27,7 @@ rust_library(
         allow_empty = False,
     ),
     aliases = {
-        "//thirdparty/crates/quinn-proto-0.11.16:quinn_proto": "proto",
+        "//thirdparty/crates/quinn-proto-0.11.17:quinn_proto": "proto",
         "//thirdparty/crates/quinn-udp-0.5.15:quinn_udp": "udp",
     },
     compile_data = glob(
@@ -116,13 +116,13 @@ rust_library(
     }),
     version = "0.11.11",
     deps = [
+        ":build_script_build",
         "//thirdparty/crates/bytes-1.12.1:bytes",
         "//thirdparty/crates/pin-project-lite-0.2.17:pin_project_lite",
-        "//thirdparty/crates/quinn-0.11.11:build_script_build",
-        "//thirdparty/crates/quinn-proto-0.11.16:quinn_proto",
+        "//thirdparty/crates/quinn-proto-0.11.17:quinn_proto",
         "//thirdparty/crates/quinn-udp-0.5.15:quinn_udp",
         "//thirdparty/crates/rustc-hash-2.1.3:rustc_hash",
-        "//thirdparty/crates/thiserror-2.0.19:thiserror",
+        "//thirdparty/crates/thiserror-2.0.20:thiserror",
         "//thirdparty/crates/tokio-1.53.1:tokio",
         "//thirdparty/crates/tracing-0.1.44:tracing",
     ] + select({

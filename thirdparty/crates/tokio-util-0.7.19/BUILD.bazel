@@ -115,8 +115,8 @@ rust_library(
     version = "0.7.19",
     deps = [
         "//thirdparty/crates/bytes-1.12.1:bytes",
-        "//thirdparty/crates/futures-core-0.3.33:futures_core",
-        "//thirdparty/crates/futures-sink-0.3.33:futures_sink",
+        "//thirdparty/crates/futures-core-0.3.34:futures_core",
+        "//thirdparty/crates/futures-sink-0.3.34:futures_sink",
         "//thirdparty/crates/pin-project-lite-0.2.17:pin_project_lite",
         "//thirdparty/crates/tokio-1.53.1:tokio",
     ] + select({

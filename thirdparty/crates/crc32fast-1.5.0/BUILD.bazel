@@ -116,8 +116,8 @@ rust_library(
     }),
     version = "1.5.0",
     deps = [
+        ":build_script_build",
         "//thirdparty/crates/cfg-if-1.0.4:cfg_if",
-        "//thirdparty/crates/crc32fast-1.5.0:build_script_build",
     ],
 )
 

@@ -112,7 +112,7 @@ rust_proc_macro(
     }),
     version = "0.22.4",
     deps = [
-        "//thirdparty/crates/jni-macros-0.22.4:build_script_build",
+        ":build_script_build",
         "//thirdparty/crates/proc-macro2-1.0.107:proc_macro2",
         "//thirdparty/crates/quote-1.0.47:quote",
         "//thirdparty/crates/simd_cesu8-1.2.0:simd_cesu8",

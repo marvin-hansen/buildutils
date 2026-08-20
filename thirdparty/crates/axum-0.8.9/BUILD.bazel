@@ -110,10 +110,10 @@ rust_library(
     deps = [
         "//thirdparty/crates/axum-core-0.5.6:axum_core",
         "//thirdparty/crates/bytes-1.12.1:bytes",
-        "//thirdparty/crates/futures-util-0.3.33:futures_util",
-        "//thirdparty/crates/http-1.4.2:http",
+        "//thirdparty/crates/futures-util-0.3.34:futures_util",
+        "//thirdparty/crates/http-1.5.0:http",
         "//thirdparty/crates/http-body-1.1.0:http_body",
-        "//thirdparty/crates/http-body-util-0.1.4:http_body_util",
+        "//thirdparty/crates/http-body-util-0.1.5:http_body_util",
         "//thirdparty/crates/itoa-1.0.18:itoa",
         "//thirdparty/crates/matchit-0.8.4:matchit",
         "//thirdparty/crates/memchr-2.8.3:memchr",

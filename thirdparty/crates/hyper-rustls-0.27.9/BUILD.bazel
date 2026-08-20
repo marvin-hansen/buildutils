@@ -113,10 +113,10 @@ rust_library(
     }),
     version = "0.27.9",
     deps = [
-        "//thirdparty/crates/http-1.4.2:http",
+        "//thirdparty/crates/http-1.5.0:http",
         "//thirdparty/crates/hyper-1.11.0:hyper",
         "//thirdparty/crates/hyper-util-0.1.20:hyper_util",
-        "//thirdparty/crates/rustls-0.23.42:rustls",
+        "//thirdparty/crates/rustls-0.23.43:rustls",
         "//thirdparty/crates/tokio-1.53.1:tokio",
         "//thirdparty/crates/tokio-rustls-0.26.4:tokio_rustls",
         "//thirdparty/crates/tower-service-0.3.3:tower_service",

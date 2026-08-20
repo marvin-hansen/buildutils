@@ -109,6 +109,6 @@ rust_library(
     version = "1.1.0",
     deps = [
         "//thirdparty/crates/bytes-1.12.1:bytes",
-        "//thirdparty/crates/http-1.4.2:http",
+        "//thirdparty/crates/http-1.5.0:http",
     ],
 )

@@ -116,8 +116,8 @@ rust_library(
     }),
     version = "2.0.5",
     deps = [
+        ":build_script_build",
         "//thirdparty/crates/mime-0.3.17:mime",
-        "//thirdparty/crates/mime_guess-2.0.5:build_script_build",
         "//thirdparty/crates/unicase-2.9.0:unicase",
     ],
 )

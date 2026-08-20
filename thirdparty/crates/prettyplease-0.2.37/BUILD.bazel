@@ -112,7 +112,7 @@ rust_library(
     }),
     version = "0.2.37",
     deps = [
-        "//thirdparty/crates/prettyplease-0.2.37:build_script_build",
+        ":build_script_build",
         "//thirdparty/crates/proc-macro2-1.0.107:proc_macro2",
         "//thirdparty/crates/syn-2.0.119:syn",
     ],
