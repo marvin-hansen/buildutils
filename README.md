@@ -6,7 +6,7 @@
 # Build Utils
 
 Utils for CI integration tests with [Bazel](https://bazel.build/) and [BuildBuddy](https://www.buildbuddy.io/), 
-but can easily be used or on any other Bazel CI system or RBE provider. 
+but can easily be used or on any other Bazel CI system. 
 
 ## Crates
 
@@ -88,5 +88,3 @@ This project is licensed under the [MIT license](LICENSE).
 
 ## Author
 * [Marvin Hansen](https://github.com/marvin-hansen)
-* Contact: https://deepcausality.com/contact/
-* Github GPG key ID: 369D5A0B210D39BC
