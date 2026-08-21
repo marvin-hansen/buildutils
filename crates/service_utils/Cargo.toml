@@ -13,10 +13,8 @@ license.workspace = true
 # Exclude all bazel files as these conflict with Bazel workspace when vencored.
 exclude = ["*.bazel", "*/*.bazel",  "*.bazel.*", "BUILD", "BUILD.bazel", "MODULE.bazel", ".bazelignore",".bazelrc", "tests/**/*"]
 
-
 [lints]
 workspace = true
-
 
 [dependencies]
 # Internal crates
@@ -25,6 +23,5 @@ wait_utils = {workspace = true}
 bon = { workspace = true }
 
 [dev-dependencies]
-# Only the test suite needs an async runtime: the crate itself is async but drives no
-# runtime of its own.
+# Only the test suite needs a runtime: the crate itself is async, but drives no runtime of its own.
 tokio = { workspace = true }

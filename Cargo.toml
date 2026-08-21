@@ -8,10 +8,10 @@ members = [
 
 [workspace.package]
 edition = "2024"
-rust-version = "1.90.0"
+rust-version = "1.98.0"
 readme = "README.md"
-repository = "https://github.com/marvin-hansen/buildutils"
-homepage = "https://github.com/marvin-hansen/buildutils"
+repository = "https://github.com/bazelverse/buildutils"
+homepage = "https://github.com/bazelverse/buildutils"
 authors = ["Marvin Hansen <marvin.hansen@gmail.com>"]
 categories = ["development-tools::build-utils"]
 
@@ -26,7 +26,6 @@ all = "warn"
 # Warnings
 deprecated-safe = "warn"
 deprecated_safe_2024 = "warn"
-
 
 [workspace.dependencies]
 # ==============
