@@ -10,7 +10,7 @@ jobs:
     name: Release-plz release
     runs-on: ubuntu-latest
     permissions:
-      contents: writes
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
